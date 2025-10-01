@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Navigation } from '@/components/Navigation'
 import { QueryProvider } from '@/lib/react-query'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/next'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -53,6 +55,8 @@ export default function RootLayout({
             {children}
           </main>
         </QueryProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )
