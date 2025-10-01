@@ -1,9 +1,22 @@
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { securityMiddleware } from '@/lib/security'
 
 export async function middleware(req: NextRequest) {
+  // Apply security middleware first
+  const securityResponse = securityMiddleware(req)
+  if (securityResponse.status !== 200) {
+    return securityResponse
+  }
+
   const res = NextResponse.next()
+  
+  // Copy security headers from security middleware
+  securityResponse.headers.forEach((value, key) => {
+    res.headers.set(key, value)
+  })
+
   const supabase = createMiddlewareClient({ req, res })
 
   const {
@@ -30,5 +43,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/auth', '/profile/:path*', '/reviews/:path*', '/watchlist/:path*', '/lists/:path*'],
+  matcher: [
+    '/auth', 
+    '/profile/:path*', 
+    '/reviews/:path*', 
+    '/watchlist/:path*', 
+    '/lists/:path*',
+    '/api/:path*' // Include API routes for security
+  ],
 }

@@ -77,6 +77,12 @@ export interface TMDBSeries {
     name: string
     logo_path: string | null
   }>
+  production_companies?: Array<{
+    id: number
+    name: string
+    logo_path: string | null
+    origin_country: string
+  }>
   seasons: Array<{
     id: number
     season_number: number
@@ -86,6 +92,22 @@ export interface TMDBSeries {
     poster_path: string | null
     air_date: string
   }>
+  credits?: {
+    cast: Array<{
+      id: number
+      name: string
+      character: string
+      profile_path: string | null
+      order: number
+    }>
+    crew: Array<{
+      id: number
+      name: string
+      job: string
+      department: string
+      profile_path: string | null
+    }>
+  }
 }
 
 class TMDBService {

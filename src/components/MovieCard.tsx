@@ -1,12 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { PlayIcon, StarIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/solid'
 import { HeartIcon, BookmarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import { tmdb } from '@/services/tmdb'
+import { OptimizedImage, useResponsiveImageSize } from '@/components/ui/OptimizedImage'
 
 interface MovieCardProps {
   id: string
@@ -44,7 +44,7 @@ export default function MovieCard({
   isWatched = false,
 }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const imageDimensions = useResponsiveImageSize(300, 450) // Base poster dimensions
 
   const year = new Date(releaseDate).getFullYear()
   const posterUrl = tmdb.getPosterUrl(posterPath, 'w500')
@@ -62,28 +62,21 @@ export default function MovieCard({
     >
       <Link href={`/${type}/${id}`}>
         <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-2xl">
-          {/* Poster Image */}
-          <div className="relative w-full h-full">
-            <Image
-              src={posterUrl}
-              alt={title}
-              fill
-              className={`object-cover transition-all duration-700 ${
-                imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
-              }`}
-              onLoad={() => setImageLoaded(true)}
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              priority={false}
-            />
-            
-            {/* Loading Shimmer */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 bg-gradient-to-r from-dark-800 via-dark-700 to-dark-800 animate-shimmer" />
-            )}
+          {/* Optimized Poster Image */}
+          <OptimizedImage
+            src={posterUrl}
+            alt={title}
+            width={imageDimensions.width}
+            height={imageDimensions.height}
+            className="w-full h-full"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            quality={80}
+            priority={false}
+            placeholder="blur"
+          />
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </div>
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">

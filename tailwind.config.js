@@ -165,6 +165,21 @@ module.exports = {
       backdropBlur: {
         xs: '2px',
       },
+      animation: {
+        'shimmer': 'shimmer 2s ease-in-out infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { 'background-position': '-400% 0' },
+          '100%': { 'background-position': '400% 0' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '50%': { transform: 'translateY(-20px) rotate(180deg)' },
+        },
+      },
     },
   },
   plugins: [
