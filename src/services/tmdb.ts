@@ -53,6 +53,53 @@ export interface TMDBMovie {
       profile_path: string | null
     }>
   }
+  keywords?: {
+    keywords: Array<{
+      id: number
+      name: string
+    }>
+  }
+  images?: {
+    backdrops: Array<{
+      file_path: string
+      width: number
+      height: number
+    }>
+    posters: Array<{
+      file_path: string
+      width: number
+      height: number
+    }>
+  }
+  similar?: {
+    results: TMDBMovie[]
+  }
+  recommendations?: {
+    results: TMDBMovie[]
+  }
+  'watch/providers'?: {
+    results: {
+      [countryCode: string]: {
+        link: string
+        flatrate?: Array<{
+          logo_path: string
+          provider_id: number
+          provider_name: string
+        }>
+        rent?: Array<{
+          logo_path: string
+          provider_id: number
+          provider_name: string
+        }>
+        buy?: Array<{
+          logo_path: string
+          provider_id: number
+          provider_name: string
+        }>
+      }
+    }
+  }
+
 }
 
 export interface TMDBSeries {
@@ -169,6 +216,15 @@ class TMDBService {
   async getMovie(movieId: number): Promise<TMDBMovie> {
     const config = this.getAxiosConfig({
       append_to_response: 'videos,credits,keywords',
+    })
+    const { data } = await axios.get(`${this.baseUrl}/movie/${movieId}`, config)
+    return data
+  }
+
+  // Get movie with all details for detail page
+  async getMovieComplete(movieId: number): Promise<TMDBMovie> {
+    const config = this.getAxiosConfig({
+      append_to_response: 'videos,credits,keywords,images,similar,recommendations,watch/providers',
     })
     const { data } = await axios.get(`${this.baseUrl}/movie/${movieId}`, config)
     return data
