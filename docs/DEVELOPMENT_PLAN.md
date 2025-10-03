@@ -1,6 +1,7 @@
 # 🎬 Cinecheck - Piano di Sviluppo Completo
 
 ## 📋 Indice
+
 1. [Panoramica Progetto](#panoramica-progetto)
 2. [Stato Attuale](#stato-attuale)
 3. [Funzionalità da Implementare](#funzionalità-da-implementare)
@@ -13,9 +14,11 @@
 # 📊 Panoramica Progetto
 
 ## 🎯 Visione
+
 **Cinecheck** è una piattaforma sociale rivoluzionaria per recensioni cinematografiche verificate attraverso un sistema di quiz intelligente.
 
 ## 🛠️ Stack Tecnologico
+
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Framer Motion
 - **Backend**: Supabase (PostgreSQL + Auth)
 - **API Esterne**: TMDB (The Movie Database)
@@ -23,6 +26,7 @@
 - **State**: React Query + Zustand
 
 ## 📈 Metriche Attuali
+
 - **Features Completate**: 10/45 (22%)
 - **Fase Corrente**: Core Features Development
 - **Sprint Attivo**: Sprint 1 (1-15 Ottobre 2025) - In corso
@@ -36,6 +40,7 @@
 ## 🎉 Funzionalità Completate (MVP)
 
 ### 1. ✅ Sistema di Autenticazione
+
 - **Status**: Completato (Settembre 2025)
 - **Funzionalità**:
   - ✅ Registrazione utenti con email/password
@@ -46,6 +51,7 @@
   - ✅ Route protection (middleware)
 
 ### 2. ✅ Database e Schema
+
 - **Status**: Completato (Settembre 2025)
 - **Componenti**:
   - ✅ 15+ tabelle PostgreSQL
@@ -56,6 +62,7 @@
   - ✅ Row Level Security policies
 
 ### 3. ✅ UI Foundation
+
 - **Status**: Completato (Settembre 2025)
 - **Elementi**:
   - ✅ Design system con Tailwind
@@ -65,15 +72,17 @@
   - ✅ Tipografia e colori del tema cinema
 
 ### 4. ✅ Integrazione TMDB
+
 - **Status**: Completato (Settembre 2025)
 - **Capabilities**:
   - ✅ Service layer per API TMDB
-  - ✅ Fetch dati film, serie TV, anime
+  - ✅ Fetch dati film e serie TV
   - ✅ Gestione errori e rate limiting
   - ✅ Caching delle richieste
   - ✅ Tipi TypeScript per dati TMDB
 
 ### 5. ✅ State Management
+
 - **Status**: Completato (Ottobre 2025)
 - **Sistema**:
   - ✅ React Query configurato
@@ -83,6 +92,7 @@
   - ✅ Query keys centralizzate
 
 ### 6. ✅ Analytics e Monitoring
+
 - **Status**: Completato (Ottobre 2025)
 - **Tools**:
   - ✅ Vercel Analytics integrato
@@ -91,6 +101,7 @@
   - ✅ Error tracking base
 
 ### 7. ✅ Movie Detail Page (Beta)
+
 - **Status**: Completato (2 Ottobre 2025)
 - **Features**:
   - ✅ Hero section con backdrop e poster
@@ -102,12 +113,14 @@
   - 🔄 Reviews section (placeholder - da collegare DB)
 
 ### 8. ✅ Librerie UI Aggiuntive
+
 - **Status**: Completato (2 Ottobre 2025)
 - **Librerie**:
   - ✅ Lucide React (icone)
   - ✅ GSAP (animazioni - per React Bits future)
 
 ### 9. ✅ Series Detail Page
+
 - **Status**: Completato (3 Ottobre 2025)
 - **Features**:
   - ✅ Hero section con backdrop e poster (SeriesHero.tsx)
@@ -123,6 +136,7 @@
   - 🔄 Reviews section (placeholder - da collegare DB)
 
 **File creati**:
+
 ```
 ✅ src/app/series/[id]/page.tsx                    # Main page con SEO metadata
 ✅ src/app/series/[id]/components/SeriesHero.tsx   # Hero con info serie
@@ -134,9 +148,11 @@
 ```
 
 **Interfacce estese**:
+
 - ✅ TMDBSeries estesa con videos, images, keywords, similar, recommendations, watch/providers
 
 **Integration completata**:
+
 - ✅ SearchResults già linka correttamente a `/series/[id]`
 - ✅ Build Next.js passa senza errori
 - ✅ Route dinamica `/series/[id]` funzionante
@@ -148,14 +164,18 @@
 ## 🔴 PRIORITÀ ALTA - Sprint 1-2 (Ottobre 2025)
 
 ### 📱 1. PAGINE DETTAGLIO CONTENUTI ⚠️ **MANCANTE - PRIORITÀ MASSIMA**
+
 **Effort**: 5 giorni | **Status**: 📋 Todo
 
 #### 1.1 [Movie Detail Page] ✅ **COMPLETATO**
+
 **Rotta**: `/movie/[id]`
 **Data Completamento**: 2 Ottobre 2025
 
 **Componenti creati**:
+
 - [x] **Hero Section** (MovieHero.tsx)
+
   ```
   ✅ Backdrop image full-width con gradient overlay
   ✅ Poster thumbnail a sinistra
@@ -166,6 +186,7 @@
   ```
 
 - [x] **Info Section** (MovieInfo.tsx)
+
   ```
   ✅ Overview/Trama completa
   ✅ Metadata bar (Durata, Data uscita, Budget, Revenue)
@@ -176,6 +197,7 @@
   ```
 
 - [x] **Media Gallery** (MovieMedia.tsx)
+
   ```
   ✅ Trailer principale embedded (YouTube)
   ✅ Gallery immagini (backdrops da TMDB)
@@ -184,6 +206,7 @@
   ```
 
 - [x] **Reviews Section** (MovieReviews.tsx - Base)
+
   ```
   ✅ Empty state con call-to-action
   ✅ Pulsanti "Fai Quiz" e "Scrivi Recensione"
@@ -193,6 +216,7 @@
   ```
 
 - [x] **Recommendations Section** (MovieRecommendations.tsx)
+
   ```
   ✅ Grid film simili da TMDB
   ✅ Grid responsive (2-6 colonne)
@@ -208,6 +232,7 @@
   ```
 
 **File creati**:
+
 ```
 ✅ src/app/movie/[id]/page.tsx                    # Main page con SEO metadata
 ✅ src/app/movie/[id]/loading.tsx                 # Loading skeleton
@@ -223,21 +248,26 @@
 ```
 
 **Dipendenze installate**:
+
 - ✅ lucide-react (icone)
 - ✅ gsap (animazioni React Bits - future)
 
 **Prossimi Step**:
+
 1. ✅ Series Detail Page completata
 2. Collegare MovieReviews e SeriesReviews al database Supabase
 3. Implementare sistema Quiz
 4. Abilitare funzionalità interattive (Watchlist, Write Review)
 
 #### 1.2 Series Detail Page ✅ **COMPLETATO**
+
 **Rotta**: `/series/[id]`
 **Data Completamento**: 3 Ottobre 2025
 
 **Componenti creati**:
+
 - [x] **Hero Section** (SeriesHero.tsx)
+
   ```
   ✅ Backdrop image full-width con gradient overlay
   ✅ Poster thumbnail a sinistra
@@ -249,6 +279,7 @@
   ```
 
 - [x] **Info Section** (SeriesInfo.tsx)
+
   ```
   ✅ Overview/Trama completa
   ✅ Metadata cards (Stagioni, Episodi, Data uscita, Stato)
@@ -266,6 +297,7 @@
   ```
 
 - [x] **Media Gallery** (SeriesMedia.tsx)
+
   ```
   ✅ Trailer principale embedded (YouTube)
   ✅ Gallery immagini (backdrops da TMDB)
@@ -275,6 +307,7 @@
   ```
 
 - [x] **Reviews Section** (SeriesReviews.tsx)
+
   ```
   ✅ Empty state identico a Movie
   ✅ Pulsanti "Fai Quiz" e "Scrivi Recensione"
@@ -292,6 +325,7 @@
   ```
 
 **TMDB Service aggiornato**:
+
 ```
 ✅ src/services/tmdb.ts
    - Aggiunto getSeriesComplete() method
@@ -304,6 +338,7 @@
 ```
 
 **Integrazione Search**:
+
 ```
 ✅ SearchResults.tsx già configurato per linkare a /series/[id]
 ✅ Filter system funzionante (all/movie/tv)
@@ -311,6 +346,7 @@
 ```
 
 **Differenze chiave Movie vs Series**:
+
 - ✅ Usa `name` invece di `title`
 - ✅ Usa `first_air_date` e `last_air_date` invece di `release_date`
 - ✅ Mostra `number_of_seasons` e `number_of_episodes`
@@ -319,6 +355,7 @@
 - ✅ Keywords in `keywords.results` invece di `keywords.keywords`
 
 **File creati**:
+
 ```
 ✅ src/app/series/[id]/page.tsx                      # Main page con SEO
 ✅ src/app/series/[id]/components/SeriesHero.tsx
@@ -331,85 +368,16 @@
 **Build Status**: ✅ Compilato con successo (npm run build)
 **Route generata**: ✅ `/series/[id]` (Dynamic)
 
-#### 1.3 Anime Detail Page ⚠️ **DA FARE**
-**Rotta**: `/series/[id]`
-
-**Componenti specifici per Serie TV**:
-- [ ] **Seasons Navigator**
-  ```
-  - Dropdown/Tabs per selezione stagione
-  - Lista episodi della stagione selezionata
-  - Progress tracking per episodi visti
-  - Air dates e descrizioni episodi
-  ```
-
-- [ ] **Episode Cards**
-  ```
-  - Thumbnail episodio
-  - Numero e titolo episodio
-  - Rating episodio
-  - Overview breve
-    - Link a recensioni episodio (future)
-  ```
-
-**File da creare**:
-```
-src/app/anime/[id]/
-├── page.tsx
-├── loading.tsx
-├── error.tsx
-└── components/
-    ├── AnimeHero.tsx
-    ├── AnimeSeasonsNavigator.tsx
-    ├── AnimeEpisodeList.tsx
-    ├── AnimeInfo.tsx
-    └── AnimeReviews.tsx
-```
-
-**Features aggiuntive per Anime**:
-- [ ] MAL (MyAnimeList) integration (future)
-  ```
-
-- [ ] **Series Specific Info**
-  ```
-  - Numero totale stagioni/episodi
-  - Status (In produzione, Conclusa, Cancellata)
-  - Network/Streaming platform
-  - Giorno e ora messa in onda
-  - Prossimo episodio (se in corso)
-  ```
-
-**File da creare**:
-```
-src/app/series/[id]/
-├── page.tsx
-├── loading.tsx
-├── error.tsx
-└── components/
-    ├── SeriesHero.tsx
-    ├── SeasonsNavigator.tsx
-    ├── EpisodeList.tsx
-    ├── SeriesInfo.tsx
-    └── SeriesReviews.tsx
-```
-
-#### 1.3 Anime Detail Page
-**Rotta**: `/series/[id]`
-
-**Componenti specifici per Serie TV**:
-- [ ] **Seasons Navigator**
-- [ ] MAL (MyAnimeList) integration (future)
-- [ ] Studi di animazione highlight
-- [ ] Opening/Ending themes info
-- [ ] Manga source info se applicabile
-
 ---
 
 ### 🎮 2. SISTEMA QUIZ COMPLETO
+
 **Effort**: 8 giorni | **Status**: 🔄 In Progress (30%)
 
 #### 2.1 Quiz Generator
+
 - [ ] **Algorithm per generazione domande**
+
   ```typescript
   // Tipi di domande da generare:
   - Plot questions (Chi ha fatto X? Cosa succede quando Y?)
@@ -420,6 +388,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Difficulty System**
+
   ```
   Easy: Domande generali (cast principale, trama base)
   Medium: Dettagli importanti (personaggi secondari, subplot)
@@ -435,9 +404,11 @@ src/app/series/[id]/
   ```
 
 #### 2.2 Quiz Interface
+
 **File**: `src/components/Quiz/`
 
 - [ ] **QuizStart.tsx** - Schermata iniziale
+
   ```
   - Preview contenuto (poster + titolo)
   - Regole del quiz (numero domande, tempo, punteggio minimo)
@@ -446,6 +417,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **QuizQuestion.tsx** - Domanda singola
+
   ```
   - Progress bar (es: "Domanda 3 di 10")
   - Timer countdown visuale
@@ -468,42 +440,53 @@ src/app/series/[id]/
   ```
 
 #### 2.3 Quiz Logic & API
+
 **Files**: `src/app/api/quiz/`
 
 - [ ] **POST /api/quiz/start** - Inizia nuovo quiz
+
   ```typescript
   Input: { contentId, difficulty? }
   Output: { attemptId, questions[] }
   ```
 
 - [ ] **POST /api/quiz/submit** - Invia risposta
+
   ```typescript
-  Input: { attemptId, questionId, answer }
-  Output: { correct, explanation, currentScore }
+  Input: {
+    attemptId, questionId, answer;
+  }
+  Output: {
+    correct, explanation, currentScore;
+  }
   ```
 
 - [ ] **POST /api/quiz/complete** - Finalizza quiz
   ```typescript
   Input: { attemptId }
-  Output: { 
-    score, 
-    passed, 
+  Output: {
+    score,
+    passed,
     timeSpent,
     rewards,
-    canReview: boolean 
+    canReview: boolean
   }
   ```
 
 ---
 
 ### ✍️ 3. SISTEMA RECENSIONI AVANZATO
+
 **Effort**: 6 giorni | **Status**: 📋 Todo
 
 #### 3.1 Review Form Component
+
 **File**: `src/components/Review/ReviewForm.tsx`
 
 **Features**:
+
 - [ ] **Multi-Rating System**
+
   ```
   - Rating Generale (0-10) - Obbligatorio
   - Plot/Storia (1-5 stars)
@@ -514,6 +497,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Rich Text Editor**
+
   ```
   - Formattazione base (bold, italic, lists)
   - Lunghezza minima 50 caratteri
@@ -523,6 +507,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Structured Fields**
+
   ```
   - Titolo recensione (opzionale, max 100 caratteri)
   - Liked Aspects (multi-select tags)
@@ -541,9 +526,11 @@ src/app/series/[id]/
   ```
 
 #### 3.2 Review Display Components
+
 **Files**: `src/components/Review/`
 
 - [ ] **ReviewCard.tsx** - Card compatta per liste
+
   ```
   - Avatar e username autore + badge verifica
   - Rating stelle + voto numerico
@@ -555,6 +542,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **ReviewFull.tsx** - Vista completa recensione
+
   ```
   - Header con autore info + follow button
   - All ratings visualizzati
@@ -576,7 +564,9 @@ src/app/series/[id]/
   ```
 
 #### 3.3 Review Interactions
+
 - [ ] **Like System**
+
   ```
   - Toggle like/unlike
   - Optimistic UI update
@@ -585,6 +575,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Comment System**
+
   ```
   - Nested comments (max 2 livelli)
   - @ mention users (future)
@@ -602,12 +593,15 @@ src/app/series/[id]/
 ---
 
 ### 🔍 4. SISTEMA RICERCA E DISCOVERY
+
 **Effort**: 5 giorni | **Status**: 📋 Todo
 
 #### 4.1 Search Interface
+
 **File**: `src/components/Search/SearchBar.tsx`
 
 - [ ] **Advanced Search Bar**
+
   ```
   - Input con icona lente
   - Autocomplete dropdown mentre digiti
@@ -618,9 +612,9 @@ src/app/series/[id]/
   ```
 
 - [ ] **Search Results Page**
-  **Rotta**: `/search?q=[query]`
+      **Rotta**: `/search?q=[query]`
   ```
-  - Tabs per tipo (All, Movies, Series, Anime, Users)
+  - Tabs per tipo (All, Movies, Series, Users)
   - Result cards con:
     * Poster/Avatar
     * Titolo/Nome
@@ -638,7 +632,8 @@ src/app/series/[id]/
 #### 4.2 Discovery Features
 
 - [ ] **Homepage Sections**
-  **File**: `src/app/page.tsx`
+      **File**: `src/app/page.tsx`
+
   ```
   - Hero Carousel (Featured/Trending)
   - "Trending Today" horizontal scroll
@@ -650,7 +645,8 @@ src/app/series/[id]/
   ```
 
 - [ ] **Browse by Genre**
-  **Rotta**: `/browse/[genre]`
+      **Rotta**: `/browse/[genre]`
+
   ```
   - Grid di contenuti del genere
   - Sub-generi filters
@@ -659,7 +655,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Trending Page**
-  **Rotta**: `/trending`
+      **Rotta**: `/trending`
   ```
   - Tabs: Oggi, Questa settimana, Questo mese
   - Type filters (Movies/Series/All)
@@ -669,14 +665,17 @@ src/app/series/[id]/
 ---
 
 ### 👤 5. USER PROFILE & SOCIAL
+
 **Effort**: 6 giorni | **Status**: 📋 Todo
 
 #### 5.1 Enhanced Profile Page
+
 **Rotta**: `/profile/[username]`
 
 **Components da creare**:
 
 - [ ] **ProfileHeader.tsx**
+
   ```
   - Banner image customizzabile
   - Avatar large con edit button
@@ -693,28 +692,29 @@ src/app/series/[id]/
   ```
 
 - [ ] **ProfileTabs.tsx**
+
   ```
   Tabs:
   1. Recensioni
      - Grid delle recensioni dell'utente
      - Filter verified/all
      - Sort by date/rating
-  
+
   2. Watchlist
      - Grid dei contenuti in watchlist
      - Categorization (To Watch, Watching, Watched)
-  
+
   3. Liste
      - Custom lists create dall'utente
      - Card per ogni lista con preview posters
-  
+
   4. Statistiche
      - Grafici e insights:
        * Generi preferiti
        * Tempo speso totale
        * Rating distribution
        * Activity heatmap
-  
+
   5. Following/Followers
      - Lista utenti seguiti/followers
      - Quick follow/unfollow
@@ -734,7 +734,8 @@ src/app/series/[id]/
 #### 5.2 Social Features
 
 - [ ] **Follow System**
-  **API**: `/api/users/follow`, `/api/users/unfollow`
+      **API**: `/api/users/follow`, `/api/users/unfollow`
+
   ```
   - Follow/Unfollow button con optimistic update
   - Following feed page
@@ -743,7 +744,8 @@ src/app/series/[id]/
   ```
 
 - [ ] **Activity Feed**
-  **Rotta**: `/feed`
+      **Rotta**: `/feed`
+
   ```
   - Timeline dei seguiti:
     * X ha recensito Y
@@ -754,7 +756,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Notifications System**
-  **Component**: `NotificationBell.tsx`
+      **Component**: `NotificationBell.tsx`
   ```
   - Bell icon in navbar con badge counter
   - Dropdown con ultime notifiche
@@ -771,12 +773,15 @@ src/app/series/[id]/
 ---
 
 ### 📋 6. LISTE E COLLEZIONI
+
 **Effort**: 4 giorni | **Status**: 📋 Todo
 
 #### 6.1 Watchlist Smart
+
 **Rotta**: `/watchlist`
 
 - [ ] **Watchlist Grid**
+
   ```
   - Toggle view: Grid / List
   - Categorize automatica:
@@ -803,9 +808,11 @@ src/app/series/[id]/
   ```
 
 #### 6.2 Custom Lists
+
 **Rotta**: `/lists/[id]`
 
 - [ ] **List Creation**
+
   ```
   - Modal "Create New List"
   - Nome lista (obbligatorio)
@@ -816,6 +823,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **List Management**
+
   ```
   - Add/Remove items
   - Reorder items (drag & drop)
@@ -824,7 +832,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Lists Directory**
-  **Rotta**: `/lists/explore`
+      **Rotta**: `/lists/explore`
   ```
   - Public lists da community
   - Featured lists editoriali
@@ -837,10 +845,13 @@ src/app/series/[id]/
 ## 🟡 PRIORITÀ MEDIA - Sprint 3-4 (Novembre 2025)
 
 ### 🎮 7. GAMIFICATION & ACHIEVEMENTS
+
 **Effort**: 8 giorni
 
 #### 7.1 Achievement System
+
 - [ ] Achievement Engine
+
   ```
   Esempi Achievement:
   - "First Steps" - Prima recensione (10 pts)
@@ -853,6 +864,7 @@ src/app/series/[id]/
   ```
 
 - [ ] **Achievement Display**
+
   ```
   - Achievements page nel profile
   - Progress bars per locked achievements
@@ -870,6 +882,7 @@ src/app/series/[id]/
   ```
 
 #### 7.2 Leaderboards
+
 **Rotta**: `/leaderboard`
 
 - [ ] **Rankings**
@@ -884,10 +897,13 @@ src/app/series/[id]/
 ---
 
 ### 🤖 8. RECOMMENDATION ENGINE
+
 **Effort**: 10 giorni
 
 #### 8.1 Basic Recommendations
+
 - [ ] **Content-Based**
+
   ```
   - "Basato sui tuoi generi preferiti"
   - "Perché hai visto X"
@@ -902,6 +918,7 @@ src/app/series/[id]/
   ```
 
 #### 8.2 Personalized Homepage
+
 - [ ] Dynamic sections based on user
 - [ ] "For You" curated feed
 - [ ] Hide already watched
@@ -910,23 +927,27 @@ src/app/series/[id]/
 ---
 
 ### 📊 9. ADMIN PANEL
+
 **Effort**: 6 giorni
 
 **Rotta**: `/admin` (solo per admin)
 
 #### 9.1 Content Moderation
+
 - [ ] Review moderation queue
 - [ ] Flagged content management
 - [ ] User reports handling
 - [ ] Ban/Suspend users
 
 #### 9.2 Content Management
+
 - [ ] Manually trigger TMDB sync
 - [ ] Edit/add quiz questions
 - [ ] Featured content selection
 - [ ] Cache management
 
 #### 9.3 Analytics Dashboard
+
 - [ ] User growth charts
 - [ ] Content popularity
 - [ ] Engagement metrics
@@ -937,6 +958,7 @@ src/app/series/[id]/
 ## 🟢 PRIORITÀ BASSA - Q1 2026
 
 ### 📱 10. PWA & MOBILE
+
 **Effort**: 12 giorni
 
 - [ ] Service Workers
@@ -946,6 +968,7 @@ src/app/series/[id]/
 - [ ] Touch gestures
 
 ### 🎥 11. VIDEO REVIEWS
+
 **Effort**: 10 giorni
 
 - [ ] Video upload
@@ -955,6 +978,7 @@ src/app/series/[id]/
 - [ ] Video comments
 
 ### 🌐 12. INTERNATIONALIZATION
+
 **Effort**: 8 giorni
 
 - [ ] Multi-language support
@@ -967,14 +991,15 @@ src/app/series/[id]/
 # 📅 Timeline Dettagliata
 
 ## Sprint 1: 1-15 Ottobre 2025
+
 ### Obiettivo: Pagine Dettaglio + Quiz Foundation
 
 **Week 1 (1-8 Ottobre)**
+
 - **Giorni 1-3**: Movie Detail Page complete ✅
   - Hero, Info, Media, Reviews sections
   - Layout responsive
   - Integration TMDB data
-  
 - **Giorni 4-5**: Series Detail Page ✅
   - SeriesHero, SeriesInfo, SeriesMedia components
   - Seasons section con dettagli
@@ -982,21 +1007,21 @@ src/app/series/[id]/
   - TMDB getSeriesComplete() integration
 
 **Week 2 (9-15 Ottobre)**
+
 - **Giorni 6-7**: Quiz UI Components 🔄
   - QuizStart, QuizQuestion, QuizResults
   - Animations e transitions
-  
 - **Giorni 8-9**: Quiz Logic 📋
   - API endpoints
   - Score calculation
   - Attempts tracking
-  
 - **Giorno 10**: Integration & Testing 📋
   - Connect pages with quiz
   - Bug fixes
   - Polish UX
 
 **Deliverables**:
+
 - ✅ Movie & Series detail pages live e funzionanti
 - 🔄 Quiz system functional (in progress)
 - 🔄 Review unlock mechanism (in progress)
@@ -1004,31 +1029,33 @@ src/app/series/[id]/
 ---
 
 ## Sprint 2: 16-30 Ottobre 2025
+
 ### Obiettivo: Reviews System + Search
 
 **Week 1 (16-23 Ottobre)**
+
 - **Giorni 1-3**: Review Form Component
   - Multi-rating system
   - Rich text editor
   - Draft functionality
-  
 - **Giorni 4-5**: Review Display
   - ReviewCard & ReviewFull components
   - Like system
   - Comments base
 
 **Week 2 (24-30 Ottobre)**
+
 - **Giorni 6-8**: Search & Discovery
   - Advanced search bar
   - Search results page
   - Filters implementation
-  
 - **Giorni 9-10**: Homepage Enhancement
   - Trending sections
   - Recommendations carousel
   - Genre browsing
 
 **Deliverables**:
+
 - ✅ Full review workflow
 - ✅ Search functionality
 - ✅ Enhanced homepage
@@ -1036,31 +1063,33 @@ src/app/series/[id]/
 ---
 
 ## Sprint 3: 1-15 Novembre 2025
+
 ### Obiettivo: Profile Enhancement + Social Features
 
 **Week 1 (1-8 Novembre)**
+
 - **Giorni 1-4**: Enhanced Profile
   - ProfileHeader, ProfileTabs
   - Statistics dashboard
   - Edit functionality
-  
 - **Giorni 5-6**: Follow System
   - Follow/Unfollow logic
   - Following feed
   - Followers lists
 
 **Week 2 (9-15 Novembre)**
+
 - **Giorni 7-9**: Notifications
   - Notification bell
   - Notification types
   - Real-time updates
-  
 - **Giorno 10**: Activity Feed
   - Timeline design
   - Feed algorithm
   - Interactions
 
 **Deliverables**:
+
 - ✅ Rich user profiles
 - ✅ Social graph system
 - ✅ Notifications active
@@ -1068,31 +1097,33 @@ src/app/series/[id]/
 ---
 
 ## Sprint 4: 16-30 Novembre 2025
+
 ### Obiettivo: Lists + Gamification
 
 **Week 1 (16-23 Novembre)**
+
 - **Giorni 1-3**: Watchlist System
   - Watchlist management
   - Categorization
   - Quick actions
-  
 - **Giorni 4-5**: Custom Lists
   - List creation
   - List management
   - Collaborative lists
 
 **Week 2 (24-30 Novembre)**
+
 - **Giorni 6-8**: Achievement System
   - Achievement engine
   - Unlock animations
   - Points & levels
-  
 - **Giorni 9-10**: Leaderboards
   - Ranking system
   - Competitive features
   - Rewards
 
 **Deliverables**:
+
 - ✅ Complete list system
 - ✅ Gamification active
 - ✅ Community engagement
@@ -1100,19 +1131,23 @@ src/app/series/[id]/
 ---
 
 ## Q1 2026: Advanced Features
+
 ### Obiettivo: Recommendation Engine + Admin
 
 **Gennaio 2026**
+
 - Recommendation algorithm
 - Personalized homepage
 - Content discovery AI
 
 **Febbraio 2026**
+
 - Admin panel
 - Moderation tools
 - Analytics dashboard
 
 **Marzo 2026**
+
 - PWA implementation
 - Performance optimization
 - Launch preparation
@@ -1124,24 +1159,28 @@ src/app/series/[id]/
 ## 📊 KPI da Monitorare
 
 ### User Engagement
+
 - **Tempo medio sessione**: Target >10 minuti
 - **Quiz completion rate**: Target >85%
 - **Review submission rate**: Target >60% post-quiz
 - **Return rate**: Target >40% settimanale
 
 ### Content Quality
+
 - **Verified reviews %**: Target >75%
 - **Average review length**: Target >150 parole
 - **Flagged content %**: Target <3%
 
 ### Community Growth
-- **Monthly Active Users**: 
+
+- **Monthly Active Users**:
   - Ottobre: 50 utenti
   - Novembre: 200 utenti
   - Dicembre: 500 utenti
   - Q1 2026: 2000 utenti
 
 ### Platform Health
+
 - **Page load time**: <2 secondi
 - **API response time**: <200ms
 - **Error rate**: <1%
@@ -1152,13 +1191,16 @@ src/app/series/[id]/
 # 🔄 Review & Update Process
 
 ## 📅 Cadenza Review
+
 - **Daily**: Standup e task status (5 min)
 - **Weekly**: Sprint progress review (30 min)
 - **Bi-weekly**: Sprint retro + planning (2 ore)
 - **Monthly**: Roadmap review (1 ora)
 
 ## ✅ Definition of Done
+
 Ogni feature è considerata "Done" quando:
+
 - [ ] Codice implementato e funzionante
 - [ ] Test manuali passati
 - [ ] Responsive su mobile/tablet/desktop
@@ -1175,6 +1217,7 @@ Ogni feature è considerata "Done" quando:
 ## 🛠️ Setup Consigliati
 
 ### File Structure per Movie Detail
+
 ```
 src/
 ├── app/
@@ -1198,6 +1241,7 @@ src/
 ```
 
 ### Performance Tips
+
 ```typescript
 // Lazy loading per gallery immagini
 const Gallery = dynamic(() => import('@/components/movie/MovieMedia'), {
@@ -1220,9 +1264,10 @@ useEffect(() => {
 
 # 🎉 Conclusione
 
-Questo è il piano completo per portare Cinecheck da MVP a piattaforma completa e competitive. 
+Questo è il piano completo per portare Cinecheck da MVP a piattaforma completa e competitive.
 
 **Prossimi passi immediati**:
+
 1. ✅ Iniziare con Movie Detail Page (priorità massima)
 2. ✅ Completare Quiz System
 3. ✅ Implementare Review System
