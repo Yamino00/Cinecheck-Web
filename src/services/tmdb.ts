@@ -422,7 +422,7 @@ class TMDBService {
     timeWindow: 'day' | 'week' = 'week'
   ): Promise<{ results: any[]; total_pages: number }> {
     const config = this.getAxiosConfig()
-    const { data } = await axios.get(`${this.baseUrl}/trending/${mediaType}/${timeWindow}`, config)
+    const { data} = await axios.get(`${this.baseUrl}/trending/${mediaType}/${timeWindow}`, config)
     return data
   }
 
@@ -460,4 +460,10 @@ class TMDBService {
 }
 
 export const tmdb = new TMDBService()
+
+// Export convenience functions
+export const searchMulti = (query: string, page?: number) => tmdb.searchMulti(query, page)
+export const searchMovies = (query: string, page?: number) => tmdb.searchMovies(query, page)
+export const searchSeries = (query: string, page?: number) => tmdb.searchSeries(query, page)
+
 export default tmdb

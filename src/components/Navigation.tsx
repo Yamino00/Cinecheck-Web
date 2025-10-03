@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
+import SearchBar from '@/components/SearchBar'
 import { 
   FilmIcon, 
   HomeIcon, 
@@ -33,23 +34,28 @@ export function Navigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-2 cursor-pointer flex-shrink-0"
             >
               <FilmIcon className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hidden sm:block">
                 Cinecheck
               </span>
             </motion.div>
           </Link>
 
+          {/* Search Bar - Centered */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <SearchBar />
+          </div>
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4 flex-shrink-0">
             {navItems.map((item) => {
               if (item.requireAuth && !user) return null
               const isActive = pathname === item.href
@@ -95,7 +101,7 @@ export function Navigation() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-white"
+            className="md:hidden text-white flex-shrink-0"
           >
             {mobileMenuOpen ? (
               <XMarkIcon className="h-6 w-6" />
@@ -114,7 +120,12 @@ export function Navigation() {
           exit={{ opacity: 0, height: 0 }}
           className="md:hidden bg-slate-900/95 backdrop-blur-xl border-t border-white/10"
         >
-          <div className="px-4 py-4 space-y-2">
+          <div className="px-4 py-4 space-y-4">
+            {/* Mobile Search Bar */}
+            <div className="flex justify-center pb-2 border-b border-white/10">
+              <SearchBar />
+            </div>
+
             {navItems.map((item) => {
               if (item.requireAuth && !user) return null
               const isActive = pathname === item.href
