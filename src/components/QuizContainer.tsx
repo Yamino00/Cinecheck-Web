@@ -217,12 +217,20 @@ export default function QuizContainer({
     setPhase("loading");
 
     try {
+      // Costruisci l'array di risposte nel formato corretto
+      const formattedAnswers = quizData.questions.map((question, index) => ({
+        question_id: question.id,
+        selected_answer: answers[index] || "", // Usa la risposta o stringa vuota se tempo scaduto
+      }));
+
+      console.log("📤 Invio risposte:", formattedAnswers);
+
       const response = await fetch("/api/quiz/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           attempt_id: quizData.attemptId,
-          answers,
+          answers: formattedAnswers,
         }),
       });
 
