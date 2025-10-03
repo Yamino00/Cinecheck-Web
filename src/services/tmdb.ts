@@ -120,6 +120,7 @@ export interface TMDBSeries {
   popularity: number
   status: string
   type: string
+  tagline?: string
   networks: Array<{
     id: number
     name: string
@@ -140,6 +141,15 @@ export interface TMDBSeries {
     poster_path: string | null
     air_date: string
   }>
+  videos?: {
+    results: Array<{
+      id: string
+      key: string
+      name: string
+      site: string
+      type: string
+    }>
+  }
   credits?: {
     cast: Array<{
       id: number
@@ -155,6 +165,52 @@ export interface TMDBSeries {
       department: string
       profile_path: string | null
     }>
+  }
+  keywords?: {
+    results: Array<{
+      id: number
+      name: string
+    }>
+  }
+  images?: {
+    backdrops: Array<{
+      file_path: string
+      width: number
+      height: number
+    }>
+    posters: Array<{
+      file_path: string
+      width: number
+      height: number
+    }>
+  }
+  similar?: {
+    results: TMDBSeries[]
+  }
+  recommendations?: {
+    results: TMDBSeries[]
+  }
+  'watch/providers'?: {
+    results: {
+      [countryCode: string]: {
+        link: string
+        flatrate?: Array<{
+          logo_path: string
+          provider_id: number
+          provider_name: string
+        }>
+        rent?: Array<{
+          logo_path: string
+          provider_id: number
+          provider_name: string
+        }>
+        buy?: Array<{
+          logo_path: string
+          provider_id: number
+          provider_name: string
+        }>
+      }
+    }
   }
 }
 
@@ -265,6 +321,15 @@ class TMDBService {
   async getSeries(seriesId: number): Promise<TMDBSeries> {
     const config = this.getAxiosConfig({
       append_to_response: 'videos,credits,keywords',
+    })
+    const { data } = await axios.get(`${this.baseUrl}/tv/${seriesId}`, config)
+    return data
+  }
+
+  // Get series with all details for detail page
+  async getSeriesComplete(seriesId: number): Promise<TMDBSeries> {
+    const config = this.getAxiosConfig({
+      append_to_response: 'videos,credits,keywords,images,similar,recommendations,watch/providers',
     })
     const { data } = await axios.get(`${this.baseUrl}/tv/${seriesId}`, config)
     return data
