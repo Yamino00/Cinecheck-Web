@@ -1,30 +1,39 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { Star, Play, Bookmark, Edit3 } from 'lucide-react'
-import { TMDBSeries } from '@/services/tmdb'
-import { tmdb } from '@/services/tmdb'
-import { Button } from '@/components/ui/Button'
+import Image from "next/image";
+import { Star, Play, Bookmark, Edit3 } from "lucide-react";
+import { TMDBSeries } from "@/services/tmdb";
+import { tmdb } from "@/services/tmdb";
+import { Button } from "@/components/ui/Button";
+import QuizButton from "@/components/QuizButton";
 
 interface SeriesHeroProps {
-  series: TMDBSeries
+  series: TMDBSeries;
 }
 
 export default function SeriesHero({ series }: SeriesHeroProps) {
-  const firstYear = series.first_air_date ? new Date(series.first_air_date).getFullYear() : ''
-  const lastYear = series.last_air_date ? new Date(series.last_air_date).getFullYear() : 'Present'
-  const yearRange = firstYear && lastYear !== firstYear ? `${firstYear}-${lastYear}` : firstYear
+  const firstYear = series.first_air_date
+    ? new Date(series.first_air_date).getFullYear()
+    : "";
+  const lastYear = series.last_air_date
+    ? new Date(series.last_air_date).getFullYear()
+    : "Present";
+  const yearRange =
+    firstYear && lastYear !== firstYear
+      ? `${firstYear}-${lastYear}`
+      : firstYear;
 
-  const seasonsText = series.number_of_seasons === 1 
-    ? '1 stagione' 
-    : `${series.number_of_seasons} stagioni`
+  const seasonsText =
+    series.number_of_seasons === 1
+      ? "1 stagione"
+      : `${series.number_of_seasons} stagioni`;
 
   return (
     <div className="relative h-[70vh] min-h-[600px] w-full overflow-hidden">
       {/* Backdrop Image */}
       <div className="absolute inset-0">
         <Image
-          src={tmdb.getBackdropUrl(series.backdrop_path, 'original')}
+          src={tmdb.getBackdropUrl(series.backdrop_path, "original")}
           alt={series.name}
           fill
           className="object-cover"
@@ -42,7 +51,7 @@ export default function SeriesHero({ series }: SeriesHeroProps) {
           <div className="hidden md:block flex-shrink-0">
             <div className="relative w-64 h-96 rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
               <Image
-                src={tmdb.getPosterUrl(series.poster_path, 'w500')}
+                src={tmdb.getPosterUrl(series.poster_path, "w500")}
                 alt={`${series.name} poster`}
                 fill
                 className="object-cover"
@@ -58,17 +67,13 @@ export default function SeriesHero({ series }: SeriesHeroProps) {
                 {series.name}
               </h1>
               {series.name !== series.original_name && (
-                <p className="text-xl text-gray-300">
-                  {series.original_name}
-                </p>
+                <p className="text-xl text-gray-300">{series.original_name}</p>
               )}
             </div>
 
             {/* Tagline */}
             {series.tagline && (
-              <p className="text-lg italic text-gray-300">
-                "{series.tagline}"
-              </p>
+              <p className="text-lg italic text-gray-300">"{series.tagline}"</p>
             )}
 
             {/* Meta Info */}
@@ -81,7 +86,7 @@ export default function SeriesHero({ series }: SeriesHeroProps) {
               <span>•</span>
               <div className="flex gap-2">
                 {series.genres.slice(0, 3).map((genre) => (
-                  <span 
+                  <span
                     key={genre.id}
                     className="px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm"
                   >
@@ -119,18 +124,31 @@ export default function SeriesHero({ series }: SeriesHeroProps) {
                 <Play className="w-5 h-5" />
                 Guarda Trailer
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20">
+              <Button
+                size="lg"
+                variant="outline"
+                className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
+              >
                 <Bookmark className="w-5 h-5" />
                 Aggiungi a Watchlist
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20">
+              <Button
+                size="lg"
+                variant="outline"
+                className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
+              >
                 <Edit3 className="w-5 h-5" />
                 Scrivi Recensione
               </Button>
+              <QuizButton
+                contentId={series.id}
+                contentType="tv"
+                contentTitle={series.name}
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

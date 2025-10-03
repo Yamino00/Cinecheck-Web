@@ -1,26 +1,27 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { Star, Play, Bookmark, Edit3 } from 'lucide-react'
-import { TMDBMovie } from '@/services/tmdb'
-import { tmdb } from '@/services/tmdb'
-import { getMovieYear, getMovieRuntime } from '@/hooks/useMovie'
-import { Button } from '@/components/ui/Button'
+import Image from "next/image";
+import { Star, Play, Bookmark, Edit3 } from "lucide-react";
+import { TMDBMovie } from "@/services/tmdb";
+import { tmdb } from "@/services/tmdb";
+import { getMovieYear, getMovieRuntime } from "@/hooks/useMovie";
+import { Button } from "@/components/ui/Button";
+import QuizButton from "@/components/QuizButton";
 
 interface MovieHeroProps {
-  movie: TMDBMovie
+  movie: TMDBMovie;
 }
 
 export default function MovieHero({ movie }: MovieHeroProps) {
-  const year = getMovieYear(movie.release_date)
-  const runtime = getMovieRuntime(movie.runtime)
+  const year = getMovieYear(movie.release_date);
+  const runtime = getMovieRuntime(movie.runtime);
 
   return (
     <div className="relative h-[70vh] min-h-[600px] w-full overflow-hidden">
       {/* Backdrop Image */}
       <div className="absolute inset-0">
         <Image
-          src={tmdb.getBackdropUrl(movie.backdrop_path, 'original')}
+          src={tmdb.getBackdropUrl(movie.backdrop_path, "original")}
           alt={movie.title}
           fill
           className="object-cover"
@@ -38,7 +39,7 @@ export default function MovieHero({ movie }: MovieHeroProps) {
           <div className="hidden md:block flex-shrink-0">
             <div className="relative w-64 h-96 rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
               <Image
-                src={tmdb.getPosterUrl(movie.poster_path, 'w500')}
+                src={tmdb.getPosterUrl(movie.poster_path, "w500")}
                 alt={`${movie.title} poster`}
                 fill
                 className="object-cover"
@@ -54,17 +55,13 @@ export default function MovieHero({ movie }: MovieHeroProps) {
                 {movie.title}
               </h1>
               {movie.title !== movie.original_title && (
-                <p className="text-xl text-gray-300">
-                  {movie.original_title}
-                </p>
+                <p className="text-xl text-gray-300">{movie.original_title}</p>
               )}
             </div>
 
             {/* Tagline */}
             {movie.tagline && (
-              <p className="text-lg italic text-gray-300">
-                "{movie.tagline}"
-              </p>
+              <p className="text-lg italic text-gray-300">"{movie.tagline}"</p>
             )}
 
             {/* Meta Info */}
@@ -75,7 +72,7 @@ export default function MovieHero({ movie }: MovieHeroProps) {
               <span>•</span>
               <div className="flex gap-2">
                 {movie.genres.slice(0, 3).map((genre) => (
-                  <span 
+                  <span
                     key={genre.id}
                     className="px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm"
                   >
@@ -113,18 +110,31 @@ export default function MovieHero({ movie }: MovieHeroProps) {
                 <Play className="w-5 h-5" />
                 Guarda Trailer
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20">
+              <Button
+                size="lg"
+                variant="outline"
+                className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
+              >
                 <Bookmark className="w-5 h-5" />
                 Aggiungi a Watchlist
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20">
+              <Button
+                size="lg"
+                variant="outline"
+                className="gap-2 bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20"
+              >
                 <Edit3 className="w-5 h-5" />
                 Scrivi Recensione
               </Button>
+              <QuizButton
+                contentId={movie.id}
+                contentType="movie"
+                contentTitle={movie.title}
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
