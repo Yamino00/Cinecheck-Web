@@ -33,22 +33,39 @@ export const signUp = async (email: string, password: string, username: string, 
       },
     },
   })
-  
+
   if (error) throw error
-  
-  // Create profile after signup
+
+  // Create profile after signup - direttamente nella tabella profiles
+  // La policy RLS "Users can insert their own profile" permette questo
   if (data.user) {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        username,
-        display_name: displayName,
-      } as any)
-    
-    if (profileError) throw profileError
+    try {
+      const { error: profileError } = await (supabase.from('profiles') as any)
+        .insert({
+          id: data.user.id,
+          username: username,
+          display_name: displayName,
+          reliability_score: 0,
+          total_reviews: 0,
+          verified_reviews: 0,
+          quiz_success_rate: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+
+      if (profileError) {
+        console.error('Error creating profile:', profileError)
+        // Non bloccare la registrazione se la creazione del profilo fallisce
+        // Il profilo verrà creato automaticamente al primo login tramite useAuth
+      } else {
+        console.log('Profile created successfully for user:', data.user.id)
+      }
+    } catch (err) {
+      console.error('Exception creating profile:', err)
+      // Non bloccare la registrazione
+    }
   }
-  
+
   return data
 }
 
@@ -57,7 +74,7 @@ export const signIn = async (email: string, password: string) => {
     email,
     password,
   })
-  
+
   if (error) throw error
   return data
 }
@@ -79,7 +96,7 @@ export const getProfile = async (userId: string) => {
     .select('*')
     .eq('id', userId)
     .single()
-  
+
   if (error) throw error
   return data
 }
@@ -92,7 +109,7 @@ export const updateProfile = async (userId: string, updates: any) => {
     .eq('id', userId)
     .select()
     .single()
-  
+
   if (error) throw error
   return data
 }
@@ -150,17 +167,17 @@ export const uploadAvatar = async (userId: string, file: File) => {
   const fileExt = file.name.split('.').pop()
   const fileName = `${userId}-${Date.now()}.${fileExt}`
   const filePath = `avatars/${fileName}`
-  
+
   const { error: uploadError } = await supabase.storage
     .from('avatars')
     .upload(filePath, file)
-  
+
   if (uploadError) throw uploadError
-  
+
   const { data } = supabase.storage
     .from('avatars')
     .getPublicUrl(filePath)
-  
+
   return data.publicUrl
 }
 
@@ -168,17 +185,17 @@ export const uploadBanner = async (userId: string, file: File) => {
   const fileExt = file.name.split('.').pop()
   const fileName = `${userId}-${Date.now()}.${fileExt}`
   const filePath = `banners/${fileName}`
-  
+
   const { error: uploadError } = await supabase.storage
     .from('banners')
     .upload(filePath, file)
-  
+
   if (uploadError) throw uploadError
-  
+
   const { data } = supabase.storage
     .from('banners')
     .getPublicUrl(filePath)
-  
+
   return data.publicUrl
 }
 
