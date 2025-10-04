@@ -9,7 +9,7 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 
 // Configurazione
 const API_KEY = process.env.GOOGLE_GEMINI_API_KEY || '';
-const MODEL_NAME = 'gemini-2.0-flash-exp'; // Gemini 2.0 Flash Experimental - Testato e funzionante
+const MODEL_NAME = 'gemini-2.0-flash'; // Gemini 2.0 Flash (stable) - Testing
 const GENERATION_CONFIG = {
     temperature: 0.8, // Creatività moderata
     topP: 0.95,

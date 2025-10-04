@@ -95,7 +95,7 @@ async function testGenerateAPI() {
 
         if (!data.cached) {
             console.log('✨ Gemini AI ha generato con successo il quiz!');
-            console.log(`   Modello usato: gemini-2.0-flash-exp`);
+            console.log(`   Modello usato: gemini-2.0-flash`);
         } else {
             console.log('💾 Quiz recuperato dalla cache (già generato in precedenza)');
         }
