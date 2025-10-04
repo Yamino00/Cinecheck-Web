@@ -47,7 +47,7 @@ export interface QuizResult {
 
 interface QuizContainerProps {
   contentId: number;
-  contentType: "movie" | "tv";
+  contentType: "movie" | "tv" | "series";
   contentTitle: string;
   onClose: () => void;
 }
@@ -99,13 +99,16 @@ export default function QuizContainer({
     setError(null);
 
     try {
+      // Normalizza il content_type per l'API (tv -> series)
+      const apiContentType = contentType === "tv" ? "series" : contentType;
+
       // Step 1: Genera/Recupera il quiz
       const generateResponse = await fetch("/api/quiz/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tmdb_id: contentId,
-          content_type: contentType,
+          content_type: apiContentType,
         }),
       });
 

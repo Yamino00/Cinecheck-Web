@@ -142,7 +142,7 @@ export default function SeriesHero({ series }: SeriesHeroProps) {
               </Button>
               <QuizButton
                 contentId={series.id}
-                contentType="tv"
+                contentType="series"
                 contentTitle={series.name}
               />
             </div>

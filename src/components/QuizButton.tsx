@@ -5,7 +5,7 @@ import QuizContainer from "./QuizContainer";
 
 interface QuizButtonProps {
   contentId: number;
-  contentType: "movie" | "tv";
+  contentType: "movie" | "tv" | "series";
   contentTitle: string;
 }
 

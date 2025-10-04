@@ -29,7 +29,12 @@ export async function POST(request: NextRequest) {
     try {
         // Parse body
         const body = await request.json();
-        const { tmdb_id, content_type } = body;
+        let { tmdb_id, content_type } = body;
+
+        // Normalizza content_type (accetta sia "tv" che "series")
+        if (content_type === "tv") {
+            content_type = "series";
+        }
 
         // Validazione
         if (!tmdb_id || !content_type) {
@@ -41,7 +46,7 @@ export async function POST(request: NextRequest) {
 
         if (!['movie', 'series'].includes(content_type)) {
             return NextResponse.json(
-                { error: 'content_type deve essere "movie" o "series"' },
+                { error: 'content_type deve essere "movie", "series" o "tv"' },
                 { status: 400 }
             );
         }
