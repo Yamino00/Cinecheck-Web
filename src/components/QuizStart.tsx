@@ -51,20 +51,20 @@ export default function QuizStart({
           <div className="space-y-3 text-gray-300">
             <div className="flex items-center justify-between">
               <span>Numero di domande:</span>
-              <span className="font-semibold text-white">8 domande</span>
+              <span className="font-semibold text-white">10 domande</span>
             </div>
 
             <div className="flex items-center justify-between">
               <span>Distribuzione difficoltà:</span>
               <div className="flex gap-2 text-sm">
                 <span className="bg-green-600/20 text-green-400 px-2 py-1 rounded">
-                  3 Facili
+                  5 Facili
                 </span>
                 <span className="bg-yellow-600/20 text-yellow-400 px-2 py-1 rounded">
-                  3 Medie
+                  4 Medie
                 </span>
                 <span className="bg-red-600/20 text-red-400 px-2 py-1 rounded">
-                  2 Difficili
+                  1 Difficile
                 </span>
               </div>
             </div>
@@ -76,9 +76,7 @@ export default function QuizStart({
 
             <div className="flex items-center justify-between">
               <span>Per superare il quiz:</span>
-              <span className="font-semibold text-purple-400">
-                48 punti (60%)
-              </span>
+              <span className="font-semibold text-purple-400">50 punti</span>
             </div>
 
             <div className="flex items-center justify-between">

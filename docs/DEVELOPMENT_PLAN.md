@@ -159,18 +159,19 @@
 
 ### 10. ✅ Sistema Quiz Completo
 
-- **Status**: Completato (4 Ottobre 2025)
+- **Status**: Completato e Aggiornato (5 Ottobre 2025)
 - **Features**:
-  - ✅ Quiz generation con Google Gemini AI (gemini-2.0-flash-exp)
-  - ✅ 8 domande per quiz con difficoltà miste
+  - ✅ Quiz generation con Google Gemini AI (gemini-2.0-flash stable)
+  - ✅ 10 domande per quiz: 5 easy (5pts), 4 medium (10pts), 1 hard (15pts) = **80pts max**
   - ✅ Supporto completo per Film e Serie TV
   - ✅ Timer 30 secondi per domanda
-  - ✅ Sistema punteggi basato su difficoltà (easy: 10pts, medium: 15pts, hard: 20pts)
+  - ✅ Soglia superamento: **50 punti (62.5%)** - valore minimo raggiungibile
   - ✅ Calcolo performance per categoria
   - ✅ Interfaccia completa (QuizStart, QuizQuestion, QuizResults)
   - ✅ API endpoints: /api/quiz/generate, /api/quiz/start, /api/quiz/submit
   - ✅ Integrazione con database per tracking attempts
   - ✅ Pulsante "Fai il Quiz" su MovieHero e SeriesHero
+  - ✅ Validazione automatica: rigenera quiz obsoleti con < 10 domande
 
 **File creati**:
 
@@ -447,9 +448,11 @@
 - ✅ **Quiz Generator** con Google Gemini AI
 
   - Generazione automatica domande da dati TMDB
-  - 8 domande per quiz con mix difficoltà (easy/medium/hard)
+  - 10 domande: 5 easy (5pts), 4 medium (10pts), 1 hard (15pts) = **80 punti totali**
   - Supporto completo Film e Serie TV
   - Caching quiz generati nel database
+  - Modello: gemini-2.0-flash (stable)
+  - Validazione automatica: rigenera quiz obsoleti
 
 - ✅ **Quiz Interface**
 
@@ -458,10 +461,15 @@
   - QuizResults: Score finale, breakdown per difficoltà, animazioni
 
 - ✅ **Quiz Logic & API**
-  - POST /api/quiz/generate: Genera/recupera quiz
+
+  - POST /api/quiz/generate: Genera/recupera quiz con auto-validazione
   - POST /api/quiz/start: Inizia attempt con tracking
   - POST /api/quiz/submit: Valida risposte e calcola punteggio
-  - Sistema punteggi: easy 10pts, medium 15pts, hard 20pts
+  - Punteggio massimo: **80 punti**, soglia **50 punti (62.5%)** - valore minimo raggiungibile
+
+- ✅ **Database Cleanup (5 Ottobre 2025)**
+  - Eliminati 26 quiz obsoleti con 8 domande
+  - Sistema auto-corregge quiz con < 10 domande
 
 **Prossimi Step**:
 

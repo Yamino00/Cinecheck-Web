@@ -143,14 +143,14 @@ ${contentData.tagline ? `**Tagline:** ${contentData.tagline}` : ''}
 
 # ISTRUZIONI
 
-Genera **8 domande a risposta multipla** per un quiz su questo ${contentType === 'movie' ? 'film' : 'serie TV'}.
+Genera **10 domande a risposta multipla** per un quiz su questo ${contentType === 'movie' ? 'film' : 'serie TV'}.
 
 **REQUISITI OBBLIGATORI:**
 
 1. **Varietà di difficoltà:**
-   - 3 domande EASY (informazioni base: anno, genere, cast principale)
-   - 3 domande MEDIUM (trama, personaggi secondari, citazioni famose)
-   - 2 domande HARD (dettagli specifici, easter eggs, curiosità produzione)
+   - 5 domande EASY (5 punti ciascuna) - informazioni base: anno, genere, cast principale, trama generale
+   - 4 domande MEDIUM (10 punti ciascuna) - dettagli specifici: personaggi secondari, scene importanti, citazioni famose
+   - 1 domanda HARD (15 punti) - dettagli oscuri, easter eggs, curiosità produzione, trivia avanzato
 
 2. **Categorie diverse:**
    - Cast & Crew
@@ -182,14 +182,14 @@ Genera **8 domande a risposta multipla** per un quiz su questo ${contentType ===
       "hint": "Suggerimento opzionale (solo per hard)",
       "explanation": "Spiegazione dettagliata della risposta corretta",
       "time_limit": 30,
-      "points": 10
+      "points": 5
     }
   ],
   "metadata": {
     "generated_at": "${new Date().toISOString()}",
     "content_title": "${title}",
     "content_type": "${contentType}",
-    "total_questions": 8
+    "total_questions": 10
   }
 }
 \`\`\`
@@ -198,7 +198,8 @@ Genera **8 domande a risposta multipla** per un quiz su questo ${contentType ===
 - Restituisci SOLO il JSON, senza testo aggiuntivo prima o dopo
 - Assicurati che il JSON sia valido e parsabile
 - Non inventare informazioni: usa solo i dati forniti
-- Se mancano dati per una categoria, usa altre categorie`;
+- Se mancano dati per una categoria, usa altre categorie
+- RISPETTA LA DISTRIBUZIONE: 5 easy (5pts), 4 medium (10pts), 1 hard (15pts)`;
 }
 
 /**

@@ -13,6 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { generateQuizQuestions, type TMDBContentData } from '@/lib/gemini';
 import {
     getQuizByTmdbId,
@@ -22,6 +23,16 @@ import {
     type DBQuizQuestion,
 } from '@/lib/quiz-db';
 import { tmdb } from '@/services/tmdb';
+
+// Client Supabase con Service Role Key per eliminazione quiz obsoleti
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+    },
+});
 
 export async function POST(request: NextRequest) {
     const startTime = Date.now();
@@ -60,21 +71,35 @@ export async function POST(request: NextRequest) {
         if (existingQuiz && existingQuiz.length > 0) {
             console.log(`✅ Quiz esistente trovato: ${existingQuiz.length} domande`);
 
-            // Recupera content_id dalla prima domanda
-            const contentId = existingQuiz[0].content_id;
+            // Verifica se il quiz ha il numero corretto di domande (10)
+            if (existingQuiz.length < 10) {
+                console.log(`⚠️ Quiz obsoleto con ${existingQuiz.length} domande. Rigenero...`);
 
-            return NextResponse.json({
-                success: true,
-                cached: true,
-                quiz: {
-                    questions: existingQuiz,
-                    total_questions: existingQuiz.length,
-                    content_type,
-                    tmdb_id,
-                    content_id: contentId,
-                },
-                generation_time: Date.now() - startTime,
-            });
+                // Elimina il quiz vecchio
+                const contentId = existingQuiz[0].content_id;
+                await supabase
+                    .from('quiz_questions')
+                    .delete()
+                    .eq('content_id', contentId);
+
+                console.log('🗑️ Quiz vecchio eliminato, procedo con rigenerazione...');
+            } else {
+                // Quiz valido con 10 domande, restituiscilo
+                const contentId = existingQuiz[0].content_id;
+
+                return NextResponse.json({
+                    success: true,
+                    cached: true,
+                    quiz: {
+                        questions: existingQuiz,
+                        total_questions: existingQuiz.length,
+                        content_type,
+                        tmdb_id,
+                        content_id: contentId,
+                    },
+                    generation_time: Date.now() - startTime,
+                });
+            }
         }
 
         console.log('🔍 Nessun quiz trovato, procedo con generazione...');

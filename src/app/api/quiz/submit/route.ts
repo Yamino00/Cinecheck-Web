@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
 
         const maxScore = questions.reduce((sum, q) => sum + q.points, 0);
         const percentage = Math.round((totalScore / maxScore) * 100);
-        const passed = percentage >= 60; // 60% per passare
+        const passed = totalScore >= 50; // 50 punti (62.5%) per passare
 
         console.log(`✅ Score: ${totalScore}/${maxScore} (${percentage}%) - ${passed ? 'PASSED' : 'FAILED'}`);
 

@@ -1,8 +1,23 @@
-# Sistema Quiz - Supporto Serie TV
+# Sistema Quiz - Supporto Film e Serie TV
 
-## ✅ Verifica Completata
+## ✅ Sistema Verificato e Aggiornato
 
-Il sistema dei quiz è stato verificato e funziona correttamente sia per **film** che per **serie TV**.
+Il sistema dei quiz è completamente funzionale per **film** e **serie TV** con la nuova distribuzione delle domande.
+
+## 🎯 Configurazione Quiz (Aggiornata 5 Ottobre 2025)
+
+### Distribuzione Domande
+
+- **5 domande EASY** (5 punti ciascuna) = 25 punti
+- **4 domande MEDIUM** (10 punti ciascuna) = 40 punti
+- **1 domanda HARD** (15 punti) = 15 punti
+- **TOTALE**: 10 domande = 85 punti massimi
+
+### Punteggio per Superare
+
+- **Soglia**: 60% (51 punti su 85)
+- **Timer**: 30 secondi per domanda
+- **Modello AI**: gemini-2.0-flash (stable)
 
 ## 🔧 Modifiche Implementate
 
