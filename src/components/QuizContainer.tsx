@@ -50,6 +50,7 @@ interface QuizContainerProps {
   contentType: "movie" | "tv" | "series";
   contentTitle: string;
   onClose: () => void;
+  onComplete?: (passed: boolean) => void;
 }
 
 export default function QuizContainer({
@@ -57,6 +58,7 @@ export default function QuizContainer({
   contentType,
   contentTitle,
   onClose,
+  onComplete,
 }: QuizContainerProps) {
   const { user, loading: authLoading } = useAuth();
   const [phase, setPhase] = useState<QuizPhase>("idle");
@@ -268,8 +270,13 @@ export default function QuizContainer({
       };
 
       console.log("✅ QuizResult trasformato:", quizResult);
+      console.log("🎯 Setting phase to completed...");
       setQuizResult(quizResult);
       setPhase("completed");
+      console.log("✨ Phase set to completed, quizResult:", quizResult);
+
+      // NON chiamare onComplete qui! Lo faremo quando l'utente chiude QuizResults
+      // in modo che possa vedere i risultati prima
     } catch (err) {
       console.error("Errore invio quiz:", err);
       setError(err instanceof Error ? err.message : "Errore sconosciuto");
@@ -289,15 +296,60 @@ export default function QuizContainer({
     setTimerActive(false);
   };
 
+  // Chiudi il quiz e notifica il parent
+  const handleClose = () => {
+    // Se c'è un risultato e il quiz è stato passato, notifica il parent
+    if (quizResult && onComplete) {
+      onComplete(quizResult.passed);
+    }
+    onClose();
+  };
+
+  // Log per debugging
+  console.log("🔄 QuizContainer Render State:", {
+    phase: phase,
+    phaseType: typeof phase,
+    phaseValue: JSON.stringify(phase),
+    isCompleted: phase === "completed",
+    hasQuizResult: !!quizResult,
+    quizResult: quizResult
+      ? {
+          score: quizResult.score,
+          passed: quizResult.passed,
+          questionsCount: quizResult.answeredQuestions?.length,
+        }
+      : null,
+  });
+
   // Render loading autenticazione
   if (authLoading) {
     return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-gray-900 rounded-lg p-8 max-w-md w-full text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <h3 className="text-xl font-bold text-white mb-2">
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-netflix-dark-950 rounded-xl p-8 max-w-md w-full text-center border border-white/10 shadow-2xl">
+          <h3 className="text-2xl font-bold text-white mb-2">
             Verifica autenticazione...
           </h3>
+          <p className="text-gray-400 mb-6">Attendere prego</p>
+
+          {/* Quiz Loader Animation */}
+          <div className="quiz-loader">
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -306,19 +358,38 @@ export default function QuizContainer({
   // Render fase loading
   if (phase === "loading") {
     return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-gray-900 rounded-lg p-8 max-w-md w-full text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <h3 className="text-xl font-bold text-white mb-2">
-            {phase === "loading" && currentQuestionIndex === 0
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-netflix-dark-950 rounded-xl p-8 max-w-md w-full text-center border border-white/10 shadow-2xl">
+          <h3 className="text-2xl font-bold text-white mb-3">
+            {currentQuestionIndex === 0
               ? "Generazione quiz in corso..."
               : "Elaborazione risultati..."}
           </h3>
-          <p className="text-gray-400">
-            {phase === "loading" && currentQuestionIndex === 0
+          <p className="text-gray-400 mb-6">
+            {currentQuestionIndex === 0
               ? "Stiamo preparando le domande per te"
               : "Calcolo del punteggio"}
           </p>
+
+          {/* Quiz Loader Animation */}
+          <div className="quiz-loader">
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+            <div className="circle-loader">
+              <div className="circle-dot"></div>
+              <div className="circle-outline"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -327,23 +398,25 @@ export default function QuizContainer({
   // Render fase error
   if (phase === "error") {
     return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-gray-900 rounded-lg p-8 max-w-md w-full">
-          <div className="text-red-500 text-5xl mb-4 text-center">⚠️</div>
-          <h3 className="text-xl font-bold text-white mb-2 text-center">
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-netflix-dark-950 rounded-xl p-8 max-w-md w-full border border-netflix-600/30 shadow-2xl">
+          <div className="w-20 h-20 bg-netflix-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-5xl">⚠️</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-3 text-center">
             Errore
           </h3>
           <p className="text-gray-400 text-center mb-6">{error}</p>
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             <button
               onClick={retryQuiz}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition"
+              className="flex-1 bg-netflix-600 hover:bg-netflix-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg"
             >
               Riprova
             </button>
             <button
-              onClick={onClose}
-              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+              onClick={handleClose}
+              className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-lg transition border border-white/10"
             >
               Chiudi
             </button>
@@ -375,14 +448,28 @@ export default function QuizContainer({
           />
         )}
 
-        {phase === "completed" && quizResult && (
-          <QuizResults
-            result={quizResult}
-            contentTitle={contentTitle}
-            onRetry={retryQuiz}
-            onClose={onClose}
-          />
-        )}
+        {(() => {
+          const shouldRenderResults = phase === "completed" && quizResult;
+          console.log("🎲 Should Render QuizResults?", {
+            phase,
+            hasQuizResult: !!quizResult,
+            shouldRender: shouldRenderResults,
+            condition1: phase === "completed",
+            condition2: !!quizResult,
+          });
+
+          if (shouldRenderResults) {
+            return (
+              <QuizResults
+                result={quizResult}
+                contentTitle={contentTitle}
+                onRetry={retryQuiz}
+                onClose={handleClose}
+              />
+            );
+          }
+          return null;
+        })()}
       </div>
     </div>
   );

@@ -353,6 +353,31 @@ export async function updateQuestionStatistics(
 }
 
 /**
+ * Verifica se l'utente ha passato il quiz per un contenuto
+ */
+export async function hasUserPassedQuiz(
+    userId: string,
+    contentId: string
+): Promise<boolean> {
+    try {
+        const { data, error } = await supabase
+            .from('quiz_attempts')
+            .select('passed')
+            .eq('user_id', userId)
+            .eq('content_id', contentId)
+            .eq('passed', true)
+            .limit(1);
+
+        if (error) throw error;
+
+        return data && data.length > 0;
+    } catch (error: any) {
+        console.error('❌ Errore verifica quiz passato:', error.message);
+        return false;
+    }
+}
+
+/**
  * Log tentativo generazione (per debug)
  */
 export async function logGenerationAttempt(

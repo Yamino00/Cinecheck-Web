@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Clock, Zap, ChevronRight, CheckCircle2 } from "lucide-react";
 import type { QuizQuestion as QuizQuestionType } from "./QuizContainer";
 
 interface QuizQuestionProps {
@@ -34,89 +36,105 @@ export default function QuizQuestion({
   const getTimerColor = () => {
     if (timeRemaining > 20) return "text-green-400";
     if (timeRemaining > 10) return "text-yellow-400";
-    return "text-red-400";
+    return "text-netflix-600";
+  };
+
+  const getTimerBgColor = () => {
+    if (timeRemaining > 20) return "bg-green-500/20 border-green-500/30";
+    if (timeRemaining > 10) return "bg-yellow-500/20 border-yellow-500/30";
+    return "bg-netflix-600/20 border-netflix-600/30";
   };
 
   // Determina il colore del badge difficoltà
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyConfig = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "bg-green-600/20 text-green-400 border-green-500/30";
+        return {
+          color: "bg-green-500/20 text-green-400 border-green-500/30",
+          label: "Facile",
+          icon: "🟢",
+        };
       case "medium":
-        return "bg-yellow-600/20 text-yellow-400 border-yellow-500/30";
+        return {
+          color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+          label: "Media",
+          icon: "🟡",
+        };
       case "hard":
-        return "bg-red-600/20 text-red-400 border-red-500/30";
+        return {
+          color: "bg-red-500/20 text-red-400 border-red-500/30",
+          label: "Difficile",
+          icon: "🔴",
+        };
       default:
-        return "bg-gray-600/20 text-gray-400 border-gray-500/30";
+        return {
+          color: "bg-white/10 text-gray-400 border-white/20",
+          label: difficulty,
+          icon: "⚪",
+        };
     }
   };
 
-  const getDifficultyLabel = (difficulty: string) => {
-    switch (difficulty) {
-      case "easy":
-        return "Facile";
-      case "medium":
-        return "Media";
-      case "hard":
-        return "Difficile";
-      default:
-        return difficulty;
-    }
-  };
+  const difficultyConfig = getDifficultyConfig(question.difficulty);
+  const progressPercentage = (questionNumber / totalQuestions) * 100;
 
   return (
-    <div className="bg-gray-900 rounded-lg p-8 shadow-2xl">
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="bg-netflix-dark-950 rounded-xl p-8 shadow-2xl max-w-3xl w-full"
+    >
       {/* Header con progresso e timer */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <span className="text-gray-400 font-semibold">
-            Domanda {questionNumber} / {totalQuestions}
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-semibold border ${getDifficultyColor(
-              question.difficulty
-            )}`}
+        <div className="flex items-center gap-3">
+          <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/10">
+            <span className="text-white font-bold text-sm">
+              {questionNumber} / {totalQuestions}
+            </span>
+          </div>
+          <div
+            className={`px-3 py-2 rounded-lg text-sm font-semibold border ${difficultyConfig.color} flex items-center gap-2`}
           >
-            {getDifficultyLabel(question.difficulty)} • {question.points} pt
-          </span>
+            <span>{difficultyConfig.icon}</span>
+            <span>{difficultyConfig.label}</span>
+            <span className="text-xs opacity-75">• {question.points} pt</span>
+          </div>
         </div>
 
         {/* Timer */}
-        <div className="flex items-center gap-2">
-          <svg
-            className={`w-6 h-6 ${getTimerColor()}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <div
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${getTimerBgColor()}`}
+        >
+          <Clock className={`w-5 h-5 ${getTimerColor()}`} />
+          <span
+            className={`text-2xl font-bold tabular-nums ${getTimerColor()}`}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span className={`text-2xl font-bold ${getTimerColor()}`}>
-            {timeRemaining}s
+            {timeRemaining}
           </span>
         </div>
       </div>
 
       {/* Barra di progresso */}
-      <div className="w-full bg-gray-700 rounded-full h-2 mb-8">
-        <div
-          className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all duration-300"
-          style={{
-            width: `${(questionNumber / totalQuestions) * 100}%`,
-          }}
+      <div className="w-full bg-white/5 rounded-full h-2 mb-8 overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${progressPercentage}%` }}
+          className="bg-netflix-600 h-2 rounded-full"
+          transition={{ duration: 0.3 }}
         />
       </div>
 
       {/* Domanda */}
       <div className="mb-8">
-        <h3 className="text-2xl font-bold text-white mb-6 leading-relaxed">
-          {question.question}
-        </h3>
+        <div className="flex items-start gap-3 mb-6">
+          <div className="w-10 h-10 bg-netflix-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl md:text-2xl font-bold text-white leading-relaxed flex-1">
+            {question.question}
+          </h3>
+        </div>
 
         {/* Risposte */}
         <div className="space-y-3">
@@ -125,56 +143,76 @@ export default function QuizQuestion({
             const letters = ["A", "B", "C", "D"];
 
             return (
-              <button
+              <motion.button
                 key={index}
                 onClick={() => handleAnswerClick(answer)}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                   isSelected
-                    ? "bg-purple-600 border-purple-500 text-white shadow-lg transform scale-105"
-                    : "bg-gray-800 border-gray-700 text-gray-300 hover:border-purple-500/50 hover:bg-gray-750"
+                    ? "bg-netflix-600 border-netflix-600 text-white shadow-lg shadow-netflix-600/20"
+                    : "bg-white/5 border-white/10 text-gray-300 hover:border-netflix-600/50 hover:bg-white/10"
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <span
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                  <div
+                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
                       isSelected
-                        ? "bg-white text-purple-600"
-                        : "bg-gray-700 text-gray-400"
+                        ? "bg-white text-netflix-600"
+                        : "bg-white/10 text-gray-400 border border-white/20"
                     }`}
                   >
-                    {letters[index]}
-                  </span>
-                  <span className="flex-1 font-medium">{answer}</span>
+                    {isSelected ? (
+                      <CheckCircle2 className="w-5 h-5" />
+                    ) : (
+                      letters[index]
+                    )}
+                  </div>
+                  <span className="flex-1 font-medium text-base">{answer}</span>
                 </div>
-              </button>
+              </motion.button>
             );
           })}
         </div>
       </div>
 
       {/* Bottone submit */}
-      <div className="flex justify-end">
-        <button
+      <div className="flex justify-end gap-3">
+        <motion.button
+          whileHover={{ scale: currentSelection ? 1.02 : 1 }}
+          whileTap={{ scale: currentSelection ? 0.98 : 1 }}
           onClick={handleSubmit}
           disabled={!currentSelection}
-          className={`px-8 py-3 rounded-lg font-bold transition ${
+          className={`px-8 py-4 rounded-lg font-bold transition flex items-center gap-2 ${
             currentSelection
-              ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg transform hover:scale-105"
-              : "bg-gray-700 text-gray-500 cursor-not-allowed"
+              ? "bg-netflix-600 hover:bg-netflix-700 text-white shadow-lg"
+              : "bg-white/5 text-gray-500 cursor-not-allowed border border-white/10"
           }`}
         >
-          {questionNumber === totalQuestions ? "✓ Termina Quiz" : "→ Prossima"}
-        </button>
+          <span>
+            {questionNumber === totalQuestions
+              ? "Termina Quiz"
+              : "Prossima Domanda"}
+          </span>
+          <ChevronRight className="w-5 h-5" />
+        </motion.button>
       </div>
 
       {/* Avviso tempo */}
       {timeRemaining <= 10 && (
-        <div className="mt-4 text-center">
-          <p className="text-red-400 text-sm font-semibold animate-pulse">
-            ⚠️ Tempo in scadenza! Rispondi rapidamente
-          </p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-4 text-center"
+        >
+          <div className="bg-netflix-600/20 border border-netflix-600/30 rounded-lg px-4 py-3">
+            <p className="text-netflix-600 text-sm font-semibold flex items-center justify-center gap-2">
+              <Clock className="w-4 h-4 animate-pulse" />
+              <span>Tempo in scadenza! Rispondi rapidamente</span>
+            </p>
+          </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -1,63 +1,71 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import { Navigation } from '@/components/Navigation'
-import { QueryProvider } from '@/lib/react-query'
-import { SpeedInsights } from '@vercel/speed-insights/next'
-import { Analytics } from '@vercel/analytics/next'
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import AppLayout from "@/components/layout/AppLayout";
+import { QueryProvider } from "@/lib/react-query";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
+import PageTransition from "@/components/transitions/PageTransition";
+import { ToastProvider } from "@/components/ui/Toast";
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  title: 'Cinecheck - Recensioni Cinematografiche Verificate',
-  description: 'La piattaforma sociale rivoluzionaria per recensioni cinematografiche autentiche con sistema di verifica tramite quiz.',
-  keywords: 'film, recensioni, cinema, serie tv, anime, quiz, verificate, autentiche',
-  authors: [{ name: 'Cinecheck Team' }],
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  ),
+  title: "Cinecheck - Recensioni Cinematografiche Verificate",
+  description:
+    "La piattaforma sociale rivoluzionaria per recensioni cinematografiche autentiche con sistema di verifica tramite quiz.",
+  keywords:
+    "film, recensioni, cinema, serie tv, anime, quiz, verificate, autentiche",
+  authors: [{ name: "Cinecheck Team" }],
   openGraph: {
-    title: 'Cinecheck - Recensioni Cinematografiche Verificate',
-    description: 'La piattaforma sociale rivoluzionaria per recensioni cinematografiche autentiche',
-    url: 'https://cinecheck.app',
-    siteName: 'Cinecheck',
+    title: "Cinecheck - Recensioni Cinematografiche Verificate",
+    description:
+      "La piattaforma sociale rivoluzionaria per recensioni cinematografiche autentiche",
+    url: "https://cinecheck.app",
+    siteName: "Cinecheck",
     images: [
       {
-        url: '/og-image.jpg',
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
       },
     ],
-    locale: 'it_IT',
-    type: 'website',
+    locale: "it_IT",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Cinecheck - Recensioni Cinematografiche Verificate',
-    description: 'La piattaforma sociale rivoluzionaria per recensioni cinematografiche autentiche',
-    images: ['/twitter-image.jpg'],
+    card: "summary_large_image",
+    title: "Cinecheck - Recensioni Cinematografiche Verificate",
+    description:
+      "La piattaforma sociale rivoluzionaria per recensioni cinematografiche autentiche",
+    images: ["/twitter-image.jpg"],
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="it" className={inter.variable}>
       <body className="font-sans antialiased">
         <QueryProvider>
-          <Navigation />
-          <main className="pt-16">
-            {children}
-          </main>
+          <ToastProvider />
+          <AppLayout>
+            <PageTransition>{children}</PageTransition>
+          </AppLayout>
         </QueryProvider>
         <SpeedInsights />
         <Analytics />
       </body>
     </html>
-  )
+  );
 }

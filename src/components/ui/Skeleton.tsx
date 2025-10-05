@@ -1,42 +1,43 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface SkeletonProps {
-  className?: string
-  variant?: 'text' | 'rectangular' | 'circular' | 'rounded'
-  width?: string | number
-  height?: string | number
-  animated?: boolean
-  delay?: number
+  className?: string;
+  variant?: "text" | "rectangular" | "circular" | "rounded";
+  width?: string | number;
+  height?: string | number;
+  animated?: boolean;
+  delay?: number;
 }
 
 export function Skeleton({
   className,
-  variant = 'rectangular',
+  variant = "rectangular",
   width,
   height,
   animated = true,
   delay = 0,
 }: SkeletonProps) {
-  const baseClasses = 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-[length:400%_100%]'
-  
-  const variantClasses = {
-    text: 'h-4 rounded',
-    rectangular: 'rounded-md',
-    circular: 'rounded-full aspect-square',
-    rounded: 'rounded-lg',
-  }
+  const baseClasses =
+    "bg-gradient-to-r from-netflix-dark-800 via-netflix-dark-700 to-netflix-dark-800 bg-[length:400%_100%]";
 
-  const animationClasses = animated 
-    ? 'animate-[shimmer_2s_ease-in-out_infinite]' 
-    : ''
+  const variantClasses = {
+    text: "h-4 rounded",
+    rectangular: "rounded-md",
+    circular: "rounded-full aspect-square",
+    rounded: "rounded-lg",
+  };
+
+  const animationClasses = animated
+    ? "animate-[shimmer_2s_ease-in-out_infinite]"
+    : "";
 
   const style = {
-    width: typeof width === 'number' ? `${width}px` : width,
-    height: typeof height === 'number' ? `${height}px` : height,
-  }
+    width: typeof width === "number" ? `${width}px` : width,
+    height: typeof height === "number" ? `${height}px` : height,
+  };
 
   return (
     <motion.div
@@ -51,44 +52,28 @@ export function Skeleton({
       )}
       style={style}
     />
-  )
+  );
 }
 
 // Skeleton for movie cards
 export function MovieCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn("space-y-3", className)}>
       {/* Poster */}
-      <Skeleton
-        variant="rounded"
-        className="aspect-[2/3] w-full"
-        delay={0}
-      />
-      
+      <Skeleton variant="rounded" className="aspect-[2/3] w-full" delay={0} />
+
       {/* Title */}
       <div className="space-y-2">
-        <Skeleton
-          variant="text"
-          className="h-5 w-3/4"
-          delay={0.1}
-        />
-        
+        <Skeleton variant="text" className="h-5 w-3/4" delay={0.1} />
+
         {/* Metadata */}
         <div className="flex justify-between items-center">
-          <Skeleton
-            variant="text"
-            className="h-4 w-16"
-            delay={0.2}
-          />
-          <Skeleton
-            variant="text"
-            className="h-4 w-12"
-            delay={0.3}
-          />
+          <Skeleton variant="text" className="h-4 w-16" delay={0.2} />
+          <Skeleton variant="text" className="h-4 w-12" delay={0.3} />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Skeleton for movie grid
@@ -99,7 +84,7 @@ export function MovieGridSkeleton({ count = 12 }: { count?: number }) {
         <MovieCardSkeleton key={i} />
       ))}
     </div>
-  )
+  );
 }
 
 // Skeleton for profile page
@@ -108,29 +93,12 @@ export function ProfileSkeleton() {
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="flex items-center space-x-6">
-        <Skeleton
-          variant="circular"
-          width={120}
-          height={120}
-          delay={0}
-        />
-        
+        <Skeleton variant="circular" width={120} height={120} delay={0} />
+
         <div className="flex-1 space-y-4">
-          <Skeleton
-            variant="text"
-            className="h-8 w-48"
-            delay={0.1}
-          />
-          <Skeleton
-            variant="text"
-            className="h-5 w-32"
-            delay={0.2}
-          />
-          <Skeleton
-            variant="text"
-            className="h-4 w-64"
-            delay={0.3}
-          />
+          <Skeleton variant="text" className="h-8 w-48" delay={0.1} />
+          <Skeleton variant="text" className="h-5 w-32" delay={0.2} />
+          <Skeleton variant="text" className="h-4 w-64" delay={0.3} />
         </div>
       </div>
 
@@ -189,7 +157,7 @@ export function ProfileSkeleton() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 // Skeleton for search results
@@ -197,14 +165,12 @@ export function SearchResultsSkeleton({ count = 8 }: { count?: number }) {
   return (
     <div className="space-y-4">
       {Array.from({ length: count }, (_, i) => (
-        <div key={i} className="flex space-x-4 p-4 bg-slate-800 rounded-lg">
-          <Skeleton
-            variant="rounded"
-            width={80}
-            height={120}
-            delay={i * 0.1}
-          />
-          
+        <div
+          key={i}
+          className="flex space-x-4 p-4 bg-netflix-dark-800 rounded-lg"
+        >
+          <Skeleton variant="rounded" width={80} height={120} delay={i * 0.1} />
+
           <div className="flex-1 space-y-3">
             <Skeleton
               variant="text"
@@ -226,7 +192,7 @@ export function SearchResultsSkeleton({ count = 8 }: { count?: number }) {
               className="h-4 w-2/3"
               delay={i * 0.1 + 0.4}
             />
-            
+
             <div className="flex space-x-2 mt-4">
               {Array.from({ length: 3 }, (_, j) => (
                 <Skeleton
@@ -241,21 +207,17 @@ export function SearchResultsSkeleton({ count = 8 }: { count?: number }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 // Skeleton for navigation
 export function NavigationSkeleton() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-netflix-dark-950/80 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Skeleton
-            variant="text"
-            className="h-8 w-32"
-            delay={0}
-          />
+          <Skeleton variant="text" className="h-8 w-32" delay={0} />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -271,22 +233,13 @@ export function NavigationSkeleton() {
 
           {/* User menu */}
           <div className="flex items-center space-x-4">
-            <Skeleton
-              variant="text"
-              className="h-8 w-20"
-              delay={0.3}
-            />
-            <Skeleton
-              variant="circular"
-              width={32}
-              height={32}
-              delay={0.4}
-            />
+            <Skeleton variant="text" className="h-8 w-20" delay={0.3} />
+            <Skeleton variant="circular" width={32} height={32} delay={0.4} />
           </div>
         </div>
       </div>
     </nav>
-  )
+  );
 }
 
 // Skeleton for quiz questions
@@ -296,16 +249,8 @@ export function QuizSkeleton() {
       {/* Progress bar */}
       <div className="space-y-2">
         <div className="flex justify-between">
-          <Skeleton
-            variant="text"
-            className="h-4 w-24"
-            delay={0}
-          />
-          <Skeleton
-            variant="text"
-            className="h-4 w-16"
-            delay={0.1}
-          />
+          <Skeleton variant="text" className="h-4 w-24" delay={0} />
+          <Skeleton variant="text" className="h-4 w-16" delay={0.1} />
         </div>
         <Skeleton
           variant="rectangular"
@@ -316,21 +261,9 @@ export function QuizSkeleton() {
 
       {/* Question */}
       <div className="space-y-4">
-        <Skeleton
-          variant="text"
-          className="h-6 w-16"
-          delay={0.3}
-        />
-        <Skeleton
-          variant="text"
-          className="h-8 w-full"
-          delay={0.4}
-        />
-        <Skeleton
-          variant="text"
-          className="h-8 w-3/4"
-          delay={0.5}
-        />
+        <Skeleton variant="text" className="h-6 w-16" delay={0.3} />
+        <Skeleton variant="text" className="h-8 w-full" delay={0.4} />
+        <Skeleton variant="text" className="h-8 w-3/4" delay={0.5} />
       </div>
 
       {/* Answers */}
@@ -347,19 +280,11 @@ export function QuizSkeleton() {
 
       {/* Actions */}
       <div className="flex justify-between pt-6">
-        <Skeleton
-          variant="rounded"
-          className="h-10 w-24"
-          delay={1}
-        />
-        <Skeleton
-          variant="rounded"
-          className="h-10 w-32"
-          delay={1.1}
-        />
+        <Skeleton variant="rounded" className="h-10 w-24" delay={1} />
+        <Skeleton variant="rounded" className="h-10 w-32" delay={1.1} />
       </div>
     </div>
-  )
+  );
 }
 
 // Loading states wrapper
@@ -369,14 +294,10 @@ export function LoadingState({
   skeleton,
   className,
 }: {
-  children: React.ReactNode
-  loading: boolean
-  skeleton: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  loading: boolean;
+  skeleton: React.ReactNode;
+  className?: string;
 }) {
-  return (
-    <div className={className}>
-      {loading ? skeleton : children}
-    </div>
-  )
+  return <div className={className}>{loading ? skeleton : children}</div>;
 }
