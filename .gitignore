@@ -195,3 +195,5 @@ storybook-static
 # Cache directories
 .cache/
 .tmp/
+# Cursor AI
+.cursor/
