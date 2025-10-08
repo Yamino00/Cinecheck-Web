@@ -192,16 +192,15 @@ export default function ParallaxHero({ movie }: ParallaxHeroProps) {
               />
 
               {/* Add to List */}
-              <MagneticButton
-                variant="secondary"
-                size="lg"
-                withRipple
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => toast.success("Added to your list!")}
-                className="flex items-center justify-center gap-3"
+                className="flex items-center justify-center gap-3 px-8 py-4 bg-netflix-dark-800/80 hover:bg-netflix-dark-700 backdrop-blur-sm text-white rounded-lg font-semibold text-lg transition-colors border border-white/10"
               >
                 <Plus className="w-6 h-6" />
                 <span>My List</span>
-              </MagneticButton>
+              </motion.button>
 
               {/* More Info */}
               <MagneticButton
