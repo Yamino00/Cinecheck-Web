@@ -80,7 +80,6 @@ export default async function MoviePage({ params }: MoviePageProps) {
             </section>
           </ScrollReveal>
 
-    
           {/* Reviews Section */}
           <ScrollReveal animation="slideUp" delay={0.1}>
             <section id="reviews">

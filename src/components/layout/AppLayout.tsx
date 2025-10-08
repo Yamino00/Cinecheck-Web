@@ -26,7 +26,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-cinema-dark-bg">
+    <>
       {/* Desktop Sidebar */}
       <Sidebar
         collapsed={sidebarCollapsed}
@@ -36,8 +36,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main Content */}
       <div
         className={`
-        flex-1 flex flex-col min-h-screen
-        lg:ml-${sidebarCollapsed ? "20" : "64"}
+        bg-cinema-dark-bg
+        ${sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"}
         transition-all duration-300
       `}
       >
@@ -45,7 +45,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <TopBar onMenuClick={() => setMobileDrawerOpen(true)} />
 
         {/* Page Content */}
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
       </div>
 
       {/* Mobile Drawer */}
@@ -53,6 +53,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
         open={mobileDrawerOpen}
         onClose={() => setMobileDrawerOpen(false)}
       />
-    </div>
+    </>
   );
 }

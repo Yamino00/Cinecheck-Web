@@ -39,7 +39,7 @@ export default function ParallaxSeriesHero({
   return (
     <div
       ref={containerRef}
-      className="relative h-[85vh] min-h-[700px] w-full overflow-hidden"
+      className="relative h-[100vh] md:h-[85vh] min-h-[600px] md:min-h-[700px] w-full overflow-hidden"
     >
       {/* Parallax Backdrop */}
       <motion.div
