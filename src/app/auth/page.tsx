@@ -24,6 +24,7 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/solid";
+import { Star, Play } from "lucide-react";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -103,24 +104,18 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 text-white flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Sfondo animato con particelle */}
+    <div className="min-h-screen w-full text-gray-100 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Netflix-style animated background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute bg-primary/10 rounded-full -top-20 -left-40 w-96 h-96 blur-3xl animate-pulse"></div>
-        <div className="absolute bg-accent/10 rounded-full -bottom-20 -right-40 w-96 h-96 blur-3xl animate-pulse delay-500"></div>
-        <div className="absolute bg-neon-purple/5 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] blur-3xl animate-float"></div>
+        <div className="absolute bg-netflix-600/10 rounded-full -top-20 -left-40 w-96 h-96 blur-3xl animate-pulse"></div>
+        <div className="absolute bg-netflix-600/10 rounded-full -bottom-20 -right-40 w-96 h-96 blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute bg-netflix-600/5 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] blur-3xl animate-float"></div>
       </div>
 
-      {/* Griglia decorativa */}
-      <div className="absolute inset-0 z-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(239, 68, 68, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.1) 1px, transparent 1px)",
-            backgroundSize: "50px 50px",
-          }}
-        ></div>
+      {/* Netflix-style glow effects */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-netflix-600/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-netflix-600/30 rounded-full blur-xl animate-pulse delay-1000"></div>
       </div>
 
       <motion.div
@@ -139,7 +134,7 @@ export default function AuthPage() {
           >
             <Card
               variant="glass"
-              className="w-full backdrop-blur-xl border-white/10 shadow-2xl"
+              className="w-full backdrop-blur-xl border-netflix-600/20 shadow-2xl bg-netflix-dark-900/80"
             >
               <CardHeader className="text-center">
                 <motion.div
@@ -148,9 +143,11 @@ export default function AuthPage() {
                   className="mx-auto mb-4"
                 >
                   <div className="relative">
-                    <FilmIcon className="h-16 w-16 text-primary animate-pulse" />
+                    <div className="w-16 h-16 bg-netflix-600 rounded-xl flex items-center justify-center shadow-netflix">
+                      <Play className="h-8 w-8 text-white" />
+                    </div>
                     <motion.div
-                      className="absolute inset-0 bg-primary/20 rounded-full blur-xl"
+                      className="absolute inset-0 bg-netflix-600/20 rounded-xl blur-xl"
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
@@ -161,12 +158,12 @@ export default function AuthPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <CardTitle className="text-3xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  <CardTitle className="text-3xl bg-gradient-to-r from-netflix-600 to-netflix-400 bg-clip-text text-transparent font-bold">
                     {isLogin
                       ? "Bentornato su Cinecheck"
                       : "Unisciti a Cinecheck"}
                   </CardTitle>
-                  <CardDescription className="mt-2">
+                  <CardDescription className="mt-2 text-gray-300">
                     {isLogin
                       ? "Accedi per scoprire recensioni verificate."
                       : "Registrati e dì la tua sul cinema."}
@@ -186,7 +183,7 @@ export default function AuthPage() {
                       >
                         <Label htmlFor="username">Username</Label>
                         <div className="relative group">
-                          <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                          <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-netflix-600 transition-colors" />
                           <Input
                             id="username"
                             type="text"
@@ -194,7 +191,7 @@ export default function AuthPage() {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
-                            className="pl-10 transition-all focus:ring-2 focus:ring-primary/50"
+                            className="pl-10 transition-all focus:ring-2 focus:ring-netflix-600/50 bg-netflix-dark-800/50 border-netflix-dark-700"
                           />
                         </div>
                       </motion.div>
@@ -204,7 +201,7 @@ export default function AuthPage() {
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <div className="relative group">
-                      <AtSymbolIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                      <AtSymbolIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-netflix-600 transition-colors" />
                       <Input
                         id="email"
                         type="email"
@@ -212,7 +209,7 @@ export default function AuthPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="pl-10 transition-all focus:ring-2 focus:ring-primary/50"
+                        className="pl-10 transition-all focus:ring-2 focus:ring-netflix-600/50 bg-netflix-dark-800/50 border-netflix-dark-700"
                       />
                     </div>
                   </div>
@@ -220,7 +217,7 @@ export default function AuthPage() {
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <div className="relative group">
-                      <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                      <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-netflix-600 transition-colors" />
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
@@ -228,12 +225,12 @@ export default function AuthPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="pl-10 pr-10 transition-all focus:ring-2 focus:ring-primary/50"
+                        className="pl-10 pr-10 transition-all focus:ring-2 focus:ring-netflix-600/50 bg-netflix-dark-800/50 border-netflix-dark-700"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-netflix-600 transition-colors"
                       >
                         {showPassword ? (
                           <EyeSlashIcon className="h-5 w-5" />
@@ -275,7 +272,7 @@ export default function AuthPage() {
 
                   <Button
                     type="submit"
-                    className="w-full relative overflow-hidden group"
+                    className="w-full relative overflow-hidden group bg-netflix-600 hover:bg-netflix-700 text-white border-netflix-600"
                     disabled={loading || success}
                     variant="premium"
                   >
@@ -318,10 +315,10 @@ export default function AuthPage() {
                 {/* Divider */}
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-700"></div>
+                    <div className="w-full border-t border-netflix-dark-700"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-slate-900 text-slate-400">
+                    <span className="px-4 bg-netflix-dark-900/80 text-gray-400">
                       Oppure continua con
                     </span>
                   </div>
@@ -333,7 +330,7 @@ export default function AuthPage() {
                   onClick={handleGoogleSignIn}
                   disabled={isGoogleLoading || loading || success}
                   variant="outline"
-                  className="w-full relative overflow-hidden group bg-white hover:bg-gray-50 text-gray-800 border-gray-300"
+                  className="w-full relative overflow-hidden group bg-white hover:bg-gray-50 text-gray-800 border-netflix-dark-700"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-3">
                     {isGoogleLoading ? (
@@ -378,16 +375,16 @@ export default function AuthPage() {
                 </Button>
 
                 <div className="mt-6 text-center">
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-gray-400">
                     {isLogin ? "Non hai un account?" : "Hai già un account?"}
                     <motion.button
                       onClick={toggleMode}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="ml-2 font-semibold text-primary hover:text-accent transition-colors relative group"
+                      className="ml-2 font-semibold text-netflix-600 hover:text-netflix-500 transition-colors relative group"
                     >
                       {isLogin ? "Registrati" : "Accedi"}
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-netflix-600 to-netflix-500 group-hover:w-full transition-all duration-300" />
                     </motion.button>
                   </p>
                 </div>
@@ -399,7 +396,7 @@ export default function AuthPage() {
                     transition={{ delay: 0.3 }}
                     className="mt-4 text-center"
                   >
-                    <button className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                    <button className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
                       Password dimenticata?
                     </button>
                   </motion.div>

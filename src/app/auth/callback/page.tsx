@@ -85,7 +85,7 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 text-white flex items-center justify-center p-4">
+    <div className="min-h-screen w-full text-gray-100 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -97,13 +97,13 @@ export default function AuthCallbackPage() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="mx-auto w-16 h-16 border-4 border-primary border-t-transparent rounded-full"
+              className="mx-auto w-16 h-16 border-4 border-netflix-600 border-t-transparent rounded-full"
             />
             <div>
               <h2 className="text-2xl font-bold mb-2">
                 Autenticazione in corso...
               </h2>
-              <p className="text-slate-400">Attendere prego</p>
+              <p className="text-gray-400">Attendere prego</p>
             </div>
           </div>
         )}
