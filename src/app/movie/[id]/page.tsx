@@ -3,7 +3,6 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { tmdb } from "@/services/tmdb";
 import ParallaxHero from "@/components/movie/ParallaxHero";
-import CastCarousel from "@/components/movie/CastCarousel";
 import AnimatedTabs from "@/components/ui/AnimatedTabs";
 import MovieInfo from "./components/MovieInfo";
 import MovieMedia from "./components/MovieMedia";
@@ -81,13 +80,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
             </section>
           </ScrollReveal>
 
-          {/* Cast Section */}
-          {movie.credits?.cast && movie.credits.cast.length > 0 && (
-            <ScrollReveal animation="slideUp" delay={0.1}>
-              <CastCarousel cast={movie.credits.cast.slice(0, 20)} />
-            </ScrollReveal>
-          )}
-
+    
           {/* Reviews Section */}
           <ScrollReveal animation="slideUp" delay={0.1}>
             <section id="reviews">
