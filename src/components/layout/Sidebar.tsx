@@ -44,12 +44,14 @@ export default function Sidebar({
       label: "Home",
       icon: Home,
       badge: null,
+      requireAuth: false,
     },
     {
       href: "/search",
       label: "Discover",
       icon: Search,
       badge: "New",
+      requireAuth: false,
     },
   ];
 
@@ -244,19 +246,11 @@ export default function Sidebar({
                         }}
                         transition={{ duration: 0.2 }}
                       >
-                        {item.icon === "CinecheckLogo" ? (
-                          <CinecheckLogo
-                            size="sm"
-                            showText={false}
-                            animated={false}
-                          />
-                        ) : (
-                          <Icon
-                            className={`${
-                              isCollapsed ? "w-6 h-6" : "w-5 h-5"
-                            } ${active ? "text-netflix-600" : "text-current"}`}
-                          />
-                        )}
+                        <Icon
+                          className={`${isCollapsed ? "w-6 h-6" : "w-5 h-5"} ${
+                            active ? "text-netflix-600" : "text-current"
+                          }`}
+                        />
                       </motion.div>
 
                       {/* Pulse effect for active items */}
