@@ -24,7 +24,8 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/solid";
-import { Star, Play } from "lucide-react";
+import { Star } from "lucide-react";
+import CinecheckLogo from "@/components/ui/CinecheckLogo";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -143,8 +144,12 @@ export default function AuthPage() {
                   className="mx-auto mb-4"
                 >
                   <div className="relative">
-                    <div className="w-16 h-16 bg-netflix-600 rounded-xl flex items-center justify-center shadow-netflix">
-                      <Play className="h-8 w-8 text-white" />
+                    <div className="w-16 h-16 rounded-xl flex items-center justify-center shadow-netflix">
+                      <CinecheckLogo
+                        size="md"
+                        showText={false}
+                        animated={false}
+                      />
                     </div>
                     <motion.div
                       className="absolute inset-0 bg-netflix-600/20 rounded-xl blur-xl"

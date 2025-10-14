@@ -37,8 +37,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div
         className={`
         bg-cinema-dark-bg
-        ${sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"}
-        transition-all duration-300
+        ${sidebarCollapsed ? "lg:ml-24" : "lg:ml-88"}
+        transition-all duration-400 ease-out
       `}
       >
         {/* Mobile TopBar */}

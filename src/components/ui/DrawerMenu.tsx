@@ -4,18 +4,8 @@ import { Drawer } from "vaul";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  Home,
-  Search,
-  Film,
-  Tv,
-  Star,
-  User,
-  Trophy,
-  LogOut,
-  LogIn,
-  X,
-} from "lucide-react";
+import { Home, Search, LogOut, LogIn, X } from "lucide-react";
+import CinecheckLogo from "./CinecheckLogo";
 import { motion } from "framer-motion";
 
 interface DrawerMenuProps {
@@ -30,16 +20,6 @@ export default function DrawerMenu({ open, onClose }: DrawerMenuProps) {
   const navigationItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/search", label: "Discover", icon: Search },
-    { href: "/movies", label: "Movies", icon: Film },
-    { href: "/series", label: "Series", icon: Tv },
-    { href: "/watchlist", label: "Watchlist", icon: Star, requireAuth: true },
-    { href: "/profile", label: "Profile", icon: User, requireAuth: true },
-    {
-      href: "/achievements",
-      label: "Achievements",
-      icon: Trophy,
-      requireAuth: true,
-    },
   ];
 
   const isActive = (href: string) => {
@@ -68,8 +48,8 @@ export default function DrawerMenu({ open, onClose }: DrawerMenuProps) {
               onClick={handleLinkClick}
               className="flex items-center gap-3"
             >
-              <div className="w-10 h-10 rounded-lg bg-netflix-600 flex items-center justify-center">
-                <Film className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <CinecheckLogo size="sm" showText={false} animated={false} />
               </div>
               <span className="text-xl font-bold text-netflix-600">
                 Cinecheck
@@ -112,7 +92,15 @@ export default function DrawerMenu({ open, onClose }: DrawerMenuProps) {
                     {active && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-netflix-600 rounded-r-full" />
                     )}
-                    <Icon className="w-6 h-6" />
+                    {item.icon === "CinecheckLogo" ? (
+                      <CinecheckLogo
+                        size="sm"
+                        showText={false}
+                        animated={false}
+                      />
+                    ) : (
+                      <Icon className="w-6 h-6" />
+                    )}
                     <span className="font-medium">{item.label}</span>
                   </motion.div>
                 </Link>
