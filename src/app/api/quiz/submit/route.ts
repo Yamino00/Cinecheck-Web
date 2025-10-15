@@ -21,7 +21,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { updateQuizAttempt, updateQuestionStatistics } from '@/lib/quiz-db';
+import { 
+    updateQuizAttempt, 
+    updateQuestionStatistics,
+    recordQuizCompletion 
+} from '@/lib/quiz-db';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -54,7 +58,7 @@ export async function POST(request: NextRequest) {
         console.log('🔍 Step 1: Verifica tentativo...');
         const { data: attempt, error: attemptError } = await supabase
             .from('quiz_attempts')
-            .select('id, user_id, content_id, questions, max_score, passed')
+            .select('id, user_id, content_id, quiz_id, questions, max_score, passed')
             .eq('id', attempt_id)
             .single();
 
@@ -191,8 +195,35 @@ export async function POST(request: NextRequest) {
             passed
         );
 
-        // Step 6: Aggiorna statistiche profilo utente
-        console.log('👤 Step 6: Aggiornamento profilo...');
+        // Step 6: Registra completamento quiz (SEMPRE - anche se fallito)
+        console.log('📝 Step 6: Registrazione completamento quiz...');
+        if (attempt.quiz_id) {
+            try {
+                await recordQuizCompletion(
+                    attempt.user_id,
+                    attempt.quiz_id,
+                    attempt.content_id,
+                    attempt_id,
+                    totalScore,
+                    maxScore,
+                    passed,  // Registra sia passed che failed
+                    time_taken || 0
+                );
+                if (passed) {
+                    console.log('✅ Quiz PASSATO e registrato - utente può scrivere recensione');
+                } else {
+                    console.log('❌ Quiz FALLITO e registrato - utente NON può rifarlo');
+                }
+            } catch (error: any) {
+                console.warn('⚠️ Errore registrazione completamento:', error.message);
+                // Non blocchiamo il flusso se fallisce la registrazione
+            }
+        } else {
+            console.warn('⚠️ quiz_id non presente nell\'attempt, skip registrazione');
+        }
+
+        // Step 7: Aggiorna statistiche profilo utente
+        console.log('👤 Step 7: Aggiornamento profilo...');
         try {
             // Recupera tutti i tentativi passati dell'utente
             const { data: userAttempts } = await supabase

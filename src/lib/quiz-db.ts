@@ -386,7 +386,8 @@ export async function logGenerationAttempt(
     success: boolean,
     errorMessage?: string,
     generationTime?: number,
-    questionsGenerated?: number
+    questionsGenerated?: number,
+    generationReason?: string
 ): Promise<void> {
     try {
         // Trova content_id se esiste
@@ -403,6 +404,7 @@ export async function logGenerationAttempt(
                 content_id: content?.id,
                 tmdb_id: tmdbId,
                 content_type: contentType,
+                generation_reason: generationReason || 'manual_generation',
                 success,
                 error_message: errorMessage,
                 generation_time: generationTime,
@@ -410,5 +412,311 @@ export async function logGenerationAttempt(
             });
     } catch (error: any) {
         console.error('❌ Errore log generazione:', error.message);
+    }
+}
+
+/**
+ * ====== SISTEMA INTELLIGENTE DI GESTIONE QUIZ ======
+ */
+
+/**
+ * Interfaccia per un Quiz completo (entity)
+ */
+export interface DBQuiz {
+    id: string;
+    content_id: string;
+    title: string;
+    description?: string;
+    created_by?: string;
+    generation_reason: string;
+    is_ai_generated: boolean;
+    generation_metadata?: any;
+    total_questions: number;
+    difficulty_distribution?: any;
+    completion_count: number;
+    average_score: number;
+    last_used_at?: string;
+    created_at: string;
+}
+
+/**
+ * Trova quiz disponibili per un utente (che non ha ancora completato)
+ * Usa la funzione SQL get_available_quizzes_for_user
+ */
+export async function getAvailableQuizzesForUser(
+    userId: string,
+    contentId: string
+): Promise<DBQuiz[]> {
+    try {
+        const { data, error } = await supabase
+            .rpc('get_available_quizzes_for_user', {
+                p_user_id: userId,
+                p_content_id: contentId,
+                p_limit: 10 // Prendiamo fino a 10 quiz disponibili
+            });
+
+        if (error) {
+            console.error('❌ Errore get_available_quizzes_for_user:', error);
+            throw error;
+        }
+
+        return data || [];
+    } catch (error: any) {
+        console.error('❌ Errore recupero quiz disponibili:', error.message);
+        return [];
+    }
+}
+
+/**
+ * Verifica se l'utente ha completato tutti i quiz disponibili
+ * Usa la funzione SQL user_has_completed_all_quizzes
+ */
+export async function userHasCompletedAllQuizzes(
+    userId: string,
+    contentId: string
+): Promise<boolean> {
+    try {
+        const { data, error } = await supabase
+            .rpc('user_has_completed_all_quizzes', {
+                p_user_id: userId,
+                p_content_id: contentId
+            });
+
+        if (error) throw error;
+        return data === true;
+    } catch (error: any) {
+        console.error('❌ Errore verifica quiz completati:', error.message);
+        return false;
+    }
+}
+
+/**
+ * Crea una nuova entity Quiz
+ */
+export async function createQuiz(
+    contentId: string,
+    title: string,
+    description: string,
+    generationReason: string,
+    isAiGenerated: boolean,
+    generationMetadata?: any,
+    createdBy?: string
+): Promise<string> {
+    try {
+        const { data, error } = await supabase
+            .from('quizzes')
+            .insert({
+                content_id: contentId,
+                title,
+                description,
+                generation_reason: generationReason,
+                is_ai_generated: isAiGenerated,
+                generation_metadata: generationMetadata || {},
+                created_by: createdBy,
+                total_questions: 0,
+                difficulty_distribution: {},
+                completion_count: 0,
+                average_score: 0
+            })
+            .select('id')
+            .single();
+
+        if (error) throw error;
+
+        console.log(`✅ Quiz entity creato: ${data.id}`);
+        return data.id;
+    } catch (error: any) {
+        console.error('❌ Errore creazione quiz:', error.message);
+        throw error;
+    }
+}
+
+/**
+ * Salva domande quiz collegate a un quiz_id specifico
+ */
+export async function saveQuizQuestionsWithQuizId(
+    quizId: string,
+    contentId: string,
+    quizResponse: GeminiQuizResponse,
+    generationPrompt: string,
+    tmdbData: any
+): Promise<DBQuizQuestion[]> {
+    try {
+        const questionsToInsert = quizResponse.questions.map(q => ({
+            quiz_id: quizId, // Collegamento al quiz
+            content_id: contentId,
+            question: q.question,
+            correct_answer: q.correct_answer,
+            wrong_answers: q.wrong_answers,
+            difficulty: q.difficulty,
+            category: q.category,
+            time_limit: q.time_limit,
+            points: q.points,
+            hint: q.hint,
+            explanation: q.explanation,
+            times_answered: 0,
+            times_correct: 0,
+            generated_by: 'gemini-2.0-flash',
+            generation_prompt: generationPrompt,
+            tmdb_data: tmdbData,
+            validation_status: 'validated',
+            quality_score: 0,
+        }));
+
+        const { data, error } = await supabase
+            .from('quiz_questions')
+            .insert(questionsToInsert)
+            .select();
+
+        if (error) throw error;
+
+        // Aggiorna total_questions nel quiz
+        await updateQuizQuestionsCount(quizId, data.length);
+
+        // Aggiorna difficulty_distribution
+        const distribution = {
+            easy: data.filter(q => q.difficulty === 'easy').length,
+            medium: data.filter(q => q.difficulty === 'medium').length,
+            hard: data.filter(q => q.difficulty === 'hard').length,
+        };
+        await updateQuizDifficultyDistribution(quizId, distribution);
+
+        console.log(`✅ Salvate ${data.length} domande per quiz ${quizId}`);
+        return data;
+    } catch (error: any) {
+        console.error('❌ Errore salvataggio quiz:', error.message);
+        throw error;
+    }
+}
+
+/**
+ * Aggiorna il conteggio delle domande di un quiz
+ */
+export async function updateQuizQuestionsCount(quizId: string, count: number): Promise<void> {
+    try {
+        await supabase
+            .from('quizzes')
+            .update({ total_questions: count })
+            .eq('id', quizId);
+    } catch (error: any) {
+        console.error('❌ Errore aggiornamento count:', error.message);
+    }
+}
+
+/**
+ * Aggiorna la distribuzione delle difficoltà di un quiz
+ */
+export async function updateQuizDifficultyDistribution(
+    quizId: string,
+    distribution: { easy: number; medium: number; hard: number }
+): Promise<void> {
+    try {
+        await supabase
+            .from('quizzes')
+            .update({ difficulty_distribution: distribution })
+            .eq('id', quizId);
+    } catch (error: any) {
+        console.error('❌ Errore aggiornamento distribution:', error.message);
+    }
+}
+
+/**
+ * Recupera domande di un quiz specifico
+ */
+export async function getQuizQuestions(quizId: string): Promise<DBQuizQuestion[]> {
+    try {
+        const { data, error } = await supabase
+            .from('quiz_questions')
+            .select('*')
+            .eq('quiz_id', quizId)
+            .eq('validation_status', 'validated')
+            .order('difficulty', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+    } catch (error: any) {
+        console.error('❌ Errore recupero domande quiz:', error.message);
+        return [];
+    }
+}
+
+/**
+ * Recupera informazioni complete di un quiz
+ */
+export async function getQuizById(quizId: string): Promise<DBQuiz | null> {
+    try {
+        const { data, error } = await supabase
+            .from('quizzes')
+            .select('*')
+            .eq('id', quizId)
+            .single();
+
+        if (error) throw error;
+        return data;
+    } catch (error: any) {
+        console.error('❌ Errore recupero quiz:', error.message);
+        return null;
+    }
+}
+
+/**
+ * Registra il completamento di un quiz da parte di un utente
+ */
+export async function recordQuizCompletion(
+    userId: string,
+    quizId: string,
+    contentId: string,
+    attemptId: string,
+    score: number,
+    maxScore: number,
+    passed: boolean,
+    timeTaken?: number
+): Promise<void> {
+    try {
+        const { error } = await supabase
+            .from('user_quiz_completions')
+            .insert({
+                user_id: userId,
+                quiz_id: quizId,
+                content_id: contentId,
+                attempt_id: attemptId,
+                score,
+                max_score: maxScore,
+                passed,
+                time_taken: timeTaken
+            });
+
+        if (error) {
+            // Se l'errore è duplicate key, l'utente ha già completato questo quiz
+            if (error.code === '23505') {
+                console.warn('⚠️ Utente ha già completato questo quiz');
+                return;
+            }
+            throw error;
+        }
+
+        console.log(`✅ Registrato completamento quiz ${quizId} per user ${userId}`);
+    } catch (error: any) {
+        console.error('❌ Errore registrazione completamento:', error.message);
+        throw error;
+    }
+}
+
+/**
+ * Aggiorna l'attempt con il quiz_id
+ */
+export async function updateQuizAttemptWithQuizId(
+    attemptId: string,
+    quizId: string
+): Promise<void> {
+    try {
+        const { error } = await supabase
+            .from('quiz_attempts')
+            .update({ quiz_id: quizId })
+            .eq('id', attemptId);
+
+        if (error) throw error;
+    } catch (error: any) {
+        console.error('❌ Errore aggiornamento attempt:', error.message);
     }
 }

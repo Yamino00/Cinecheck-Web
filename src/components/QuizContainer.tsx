@@ -43,6 +43,8 @@ export interface QuizResult {
     difficulty: string;
     points: number;
   }>;
+  isNewQuiz?: boolean; // Indica se è stato generato un nuovo quiz
+  generationReason?: string; // Motivo della generazione
 }
 
 interface QuizContainerProps {
@@ -69,6 +71,10 @@ export default function QuizContainer({
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(30); // 30 secondi per domanda
   const [timerActive, setTimerActive] = useState(false);
+  const [quizMetadata, setQuizMetadata] = useState<{
+    isReused: boolean;
+    generationReason?: string;
+  } | null>(null);
 
   // Timer countdown
   useEffect(() => {
@@ -104,11 +110,12 @@ export default function QuizContainer({
       // Normalizza il content_type per l'API (tv -> series)
       const apiContentType = contentType === "tv" ? "series" : contentType;
 
-      // Step 1: Genera/Recupera il quiz
+      // Step 1: Genera/Recupera il quiz (Sistema Intelligente)
       const generateResponse = await fetch("/api/quiz/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          user_id: user.id, // NUOVO: necessario per il sistema intelligente
           tmdb_id: contentId,
           content_type: apiContentType,
         }),
@@ -122,24 +129,49 @@ export default function QuizContainer({
       const generateData = await generateResponse.json();
 
       console.log("📦 Generate Response:", generateData);
-
-      // Gestisci struttura dati diversa (può essere generateData.content_id o generateData.quiz.content_id)
+      
+      // Sistema intelligente: ottieni quiz_id e content_id
+      const quiz_id = generateData.quiz_id; // NUOVO: ID del quiz specifico
       const quiz_content_id =
         generateData.content_id || generateData.quiz?.content_id;
+        
+      // Salva metadata del quiz per mostrare all'utente
+      setQuizMetadata({
+        isReused: generateData.reused || false,
+        generationReason: generateData.generation_reason,
+      });
+      
+      // Log se il quiz è stato riutilizzato o generato nuovo
+      if (generateData.reused) {
+        console.log("♻️ Quiz riutilizzato dal database (cached)");
+      } else {
+        console.log("🆕 Nuovo quiz generato con AI");
+        if (generateData.generation_reason === 'all_quizzes_completed') {
+          console.log("🎆 Motivo: L'utente ha completato tutti i quiz esistenti");
+        } else if (generateData.generation_reason === 'no_quiz_exists') {
+          console.log("🆕 Motivo: Primo quiz per questo contenuto");
+        }
+      }
+      
+      if (!quiz_id) {
+        console.error("❌ Quiz ID mancante. Dati ricevuti:", generateData);
+        throw new Error("Quiz ID mancante nella risposta");
+      }
 
       if (!quiz_content_id) {
         console.error("❌ Content ID mancante. Dati ricevuti:", generateData);
         throw new Error("Content ID mancante nella risposta");
       }
 
-      console.log("✅ Content ID trovato:", quiz_content_id);
+      console.log("✅ Quiz ID:", quiz_id, "| Content ID:", quiz_content_id);
 
-      // Step 2: Avvia l'attempt
+      // Step 2: Avvia l'attempt con quiz_id specifico
       const startResponse = await fetch("/api/quiz/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: user.id,
+          quiz_id: quiz_id, // NUOVO: passa il quiz_id specifico
           content_id: quiz_content_id,
         }),
       });
@@ -267,6 +299,8 @@ export default function QuizContainer({
           difficulty: q.difficulty,
           points: q.points,
         })),
+        isNewQuiz: quizMetadata?.isReused === false,
+        generationReason: quizMetadata?.generationReason,
       };
 
       console.log("✅ QuizResult trasformato:", quizResult);
@@ -294,6 +328,7 @@ export default function QuizContainer({
     setQuizResult(null);
     setTimeRemaining(30);
     setTimerActive(false);
+    setQuizMetadata(null); // Reset metadata
   };
 
   // Chiudi il quiz e notifica il parent
@@ -362,12 +397,18 @@ export default function QuizContainer({
         <div className="bg-netflix-dark-950 rounded-xl p-8 max-w-md w-full text-center border border-white/10 shadow-2xl">
           <h3 className="text-2xl font-bold text-white mb-3">
             {currentQuestionIndex === 0
-              ? "Generazione quiz in corso..."
+              ? quizMetadata?.isReused 
+                ? "Caricamento quiz..."
+                : "Generazione quiz in corso..."
               : "Elaborazione risultati..."}
           </h3>
           <p className="text-gray-400 mb-6">
             {currentQuestionIndex === 0
-              ? "Stiamo preparando le domande per te"
+              ? quizMetadata?.isReused
+                ? "Recupero quiz esistente dal database"
+                : quizMetadata?.generationReason === 'all_quizzes_completed'
+                  ? "Creazione di un nuovo quiz personalizzato per te"
+                  : "Stiamo preparando le domande per te"
               : "Calcolo del punteggio"}
           </p>
 

@@ -105,6 +105,17 @@ export default function QuizResults({
       {/* Emoji celebrazione */}
       <div className="text-center mb-6">
         <div className="text-7xl mb-2">{result.passed ? "🎉" : "😔"}</div>
+        {result.isNewQuiz && result.generationReason === 'all_quizzes_completed' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-purple-600/20 border border-purple-500/30 rounded-full"
+          >
+            <span className="text-purple-400 text-sm font-medium">
+              🎆 Quiz esclusivo creato per te!
+            </span>
+          </motion.div>
+        )}
       </div>
 
       {/* Punteggio principale */}
@@ -372,7 +383,7 @@ export default function QuizResults({
           className="flex-1 bg-netflix-600 hover:bg-netflix-700 text-white font-bold py-4 px-6 rounded-lg transition shadow-lg flex items-center justify-center gap-2"
         >
           <RotateCcw className="w-5 h-5" />
-          <span>Riprova</span>
+          <span>{result.passed ? "Prova Altro Quiz" : "Prova Quiz Diverso"}</span>
         </motion.button>
         <motion.button
           whileHover={{ scale: 1.02 }}
