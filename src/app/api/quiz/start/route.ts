@@ -1,21 +1,26 @@
 /**
  * API Route: /api/quiz/start
  * 
- * Inizia un tentativo quiz per un utente
+ * Inizia un tentativo quiz per un utente su un quiz specifico
  * 
  * POST /api/quiz/start
- * Body: { user_id: string, content_id: string }
+ * Body: { user_id: string, quiz_id: string, content_id: string }
  * 
  * Flow:
- * 1. Recupera domande quiz dal DB
+ * 1. Recupera domande del quiz specifico dal DB
  * 2. Randomizza ordine domande
- * 3. Crea record quiz_attempts
+ * 3. Crea record quiz_attempts (con quiz_id)
  * 4. Restituisce domande (senza correct_answer per sicurezza)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createQuizAttempt, type DBQuizQuestion } from '@/lib/quiz-db';
+import { 
+    createQuizAttempt, 
+    updateQuizAttemptWithQuizId,
+    getQuizQuestions,
+    type DBQuizQuestion 
+} from '@/lib/quiz-db';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -44,42 +49,30 @@ export async function POST(request: NextRequest) {
     try {
         // Parse body
         const body = await request.json();
-        const { user_id, content_id } = body;
+        const { user_id, quiz_id, content_id } = body;
 
         // Validazione
-        if (!user_id || !content_id) {
+        if (!user_id || !quiz_id || !content_id) {
             return NextResponse.json(
-                { error: 'Parametri mancanti: user_id e content_id richiesti' },
+                { error: 'Parametri mancanti: user_id, quiz_id e content_id richiesti' },
                 { status: 400 }
             );
         }
 
-        console.log(`\n🎮 Quiz Start Request: user=${user_id}, content=${content_id}`);
+        console.log(`\n🎮 Quiz Start Request: user=${user_id}, quiz=${quiz_id}, content=${content_id}`);
 
-        // Step 1: Recupera domande dal database
+        // Step 1: Recupera domande del quiz specifico
         console.log('📋 Step 1: Recupero domande quiz...');
-        const { data: questions, error: questionsError } = await supabase
-            .from('quiz_questions')
-            .select('*')
-            .eq('content_id', content_id)
-            .eq('validation_status', 'validated');
-
-        if (questionsError) {
-            console.error('❌ Errore recupero domande:', questionsError);
-            return NextResponse.json(
-                { error: 'Impossibile recuperare domande quiz', details: questionsError.message },
-                { status: 500 }
-            );
-        }
+        const questions = await getQuizQuestions(quiz_id);
 
         if (!questions || questions.length === 0) {
             return NextResponse.json(
-                { error: 'Nessun quiz disponibile per questo contenuto' },
+                { error: 'Nessuna domanda disponibile per questo quiz' },
                 { status: 404 }
             );
         }
 
-        console.log(`✅ ${questions.length} domande recuperate`);
+        console.log(`✅ ${questions.length} domande recuperate per quiz ${quiz_id}`);
 
         // Step 2: Randomizza ordine domande
         console.log('🔀 Step 2: Randomizzazione domande...');
@@ -113,6 +106,8 @@ export async function POST(request: NextRequest) {
         let attemptId: string;
         try {
             attemptId = await createQuizAttempt(user_id, content_id, questionIds);
+            // Collega il quiz_id all'attempt
+            await updateQuizAttemptWithQuizId(attemptId, quiz_id);
         } catch (error: any) {
             console.error('❌ Errore creazione tentativo:', error);
             return NextResponse.json(
@@ -121,7 +116,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log(`✅ Quiz avviato: attempt_id=${attemptId}`);
+        console.log(`✅ Quiz avviato: attempt_id=${attemptId}, quiz_id=${quiz_id}`);
 
         // Calcola informazioni quiz
         const totalPoints = questions.reduce((sum: number, q: any) => sum + (q.points || 10), 0);

@@ -1,26 +1,35 @@
 /**
  * API Route: /api/quiz/generate
  * 
- * Genera o recupera un quiz per un contenuto (film/serie)
+ * Sistema intelligente di gestione quiz
  * 
  * POST /api/quiz/generate
- * Body: { tmdb_id: number, content_type: 'movie' | 'series' }
+ * Body: { user_id: string, tmdb_id: number, content_type: 'movie' | 'series' }
  * 
- * Flow:
- * 1. Verifica se esiste già quiz in DB
- * 2. Se sì, restituisce quiz esistente
- * 3. Se no, fetch dati TMDB → genera con Gemini → salva DB → restituisce
+ * Flow intelligente:
+ * 1. Controlla se esistono quiz disponibili che l'utente NON ha fatto
+ * 2. Se esiste almeno un quiz disponibile, restituiscilo
+ * 3. Se l'utente ha fatto tutti i quiz O non esistono quiz:
+ *    - Genera un nuovo quiz con Gemini
+ *    - Salvalo come nuova entity nel database
+ *    - Restituiscilo
+ * 
+ * Regola: Un utente non può mai rifare lo stesso quiz due volte
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateQuizQuestions, type TMDBContentData } from '@/lib/gemini';
 import {
-    getQuizByTmdbId,
-    saveQuizQuestions,
     getOrCreateContent,
     logGenerationAttempt,
+    getAvailableQuizzesForUser,
+    userHasCompletedAllQuizzes,
+    createQuiz,
+    saveQuizQuestionsWithQuizId,
+    getQuizQuestions,
     type DBQuizQuestion,
+    type DBQuiz,
 } from '@/lib/quiz-db';
 import { tmdb } from '@/services/tmdb';
 
@@ -40,7 +49,7 @@ export async function POST(request: NextRequest) {
     try {
         // Parse body
         const body = await request.json();
-        let { tmdb_id, content_type } = body;
+        let { user_id, tmdb_id, content_type } = body;
 
         // Normalizza content_type (accetta sia "tv" che "series")
         if (content_type === "tv") {
@@ -48,9 +57,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Validazione
-        if (!tmdb_id || !content_type) {
+        if (!user_id || !tmdb_id || !content_type) {
             return NextResponse.json(
-                { error: 'Parametri mancanti: tmdb_id e content_type richiesti' },
+                { error: 'Parametri mancanti: user_id, tmdb_id e content_type richiesti' },
                 { status: 400 }
             );
         }
@@ -62,70 +71,86 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log(`\n🎯 Quiz Generation Request: ${content_type} #${tmdb_id}`);
+        console.log(`\n🎯 Quiz Generation Request (Intelligent): ${content_type} #${tmdb_id} for user ${user_id}`);
 
-        // Step 1: Verifica se esiste già quiz
-        console.log('📋 Step 1: Controllo quiz esistente...');
-        const existingQuiz = await getQuizByTmdbId(tmdb_id, content_type);
-
-        if (existingQuiz && existingQuiz.length > 0) {
-            console.log(`✅ Quiz esistente trovato: ${existingQuiz.length} domande`);
-
-            // Verifica se il quiz ha il numero corretto di domande (10)
-            if (existingQuiz.length < 10) {
-                console.log(`⚠️ Quiz obsoleto con ${existingQuiz.length} domande. Rigenero...`);
-
-                // Elimina il quiz vecchio
-                const contentId = existingQuiz[0].content_id;
-                await supabase
-                    .from('quiz_questions')
-                    .delete()
-                    .eq('content_id', contentId);
-
-                console.log('🗑️ Quiz vecchio eliminato, procedo con rigenerazione...');
-            } else {
-                // Quiz valido con 10 domande, restituiscilo
-                const contentId = existingQuiz[0].content_id;
-
-                return NextResponse.json({
-                    success: true,
-                    cached: true,
-                    quiz: {
-                        questions: existingQuiz,
-                        total_questions: existingQuiz.length,
-                        content_type,
-                        tmdb_id,
-                        content_id: contentId,
-                    },
-                    generation_time: Date.now() - startTime,
-                });
-            }
-        }
-
-        console.log('🔍 Nessun quiz trovato, procedo con generazione...');
-
-        // Step 2: Fetch dati completi da TMDB
-        console.log('📡 Step 2: Recupero dati TMDB...');
+        // Step 0: Crea/recupera content_id per questo TMDB ID
+        console.log('📋 Step 0: Recupero/creazione content...');
+        let contentId: string;
         let tmdbData: any;
 
         try {
+            // Fetch dati TMDB prima di creare content
             if (content_type === 'movie') {
                 tmdbData = await tmdb.getMovieComplete(tmdb_id);
             } else {
                 tmdbData = await tmdb.getSeriesComplete(tmdb_id);
             }
-
             console.log(`✅ Dati TMDB recuperati: ${tmdbData.title || tmdbData.name}`);
-        } catch (error: any) {
-            await logGenerationAttempt(tmdb_id, content_type, false, `TMDB fetch failed: ${error.message}`);
 
+            contentId = await getOrCreateContent(tmdb_id, content_type, tmdbData);
+            console.log(`✅ Content ID: ${contentId}`);
+        } catch (error: any) {
             return NextResponse.json(
-                { error: 'Impossibile recuperare dati TMDB', details: error.message },
+                { error: 'Impossibile recuperare dati TMDB o creare content', details: error.message },
                 { status: 404 }
             );
         }
 
-        // Step 3: Prepara dati per Gemini
+        // Step 1: Cerca quiz disponibili che l'utente NON ha ancora fatto
+        console.log('🔍 Step 1: Ricerca quiz disponibili per utente...');
+        let availableQuizzes: DBQuiz[] = [];
+        
+        try {
+            availableQuizzes = await getAvailableQuizzesForUser(user_id, contentId);
+            console.log(`📊 Trovati ${availableQuizzes.length} quiz disponibili`);
+        } catch (error: any) {
+            console.error('⚠️ Errore recupero quiz disponibili:', error.message);
+            // Continuiamo comunque, genereremo un nuovo quiz
+        }
+
+        // Step 2: Se esiste almeno un quiz disponibile, restituiscilo
+        if (availableQuizzes.length > 0) {
+            const selectedQuiz = availableQuizzes[0]; // Prendi il primo (più popolare)
+            console.log(`✅ Quiz disponibile trovato: ${selectedQuiz.id}`);
+
+            // Carica le domande del quiz
+            const questions = await getQuizQuestions(selectedQuiz.id);
+
+            if (questions.length > 0) {
+                console.log(`✅ Restituisco quiz esistente con ${questions.length} domande`);
+                
+                return NextResponse.json({
+                    success: true,
+                    cached: true,
+                    reused: true,
+                    quiz_id: selectedQuiz.id,
+                    quiz: {
+                        questions,
+                        total_questions: questions.length,
+                        content_type,
+                        tmdb_id,
+                        content_id: contentId,
+                        difficulty_distribution: selectedQuiz.difficulty_distribution,
+                    },
+                    generation_time: Date.now() - startTime,
+                    message: 'Quiz riutilizzato dal database'
+                });
+            }
+        }
+
+        // Step 3: L'utente ha fatto tutti i quiz O non esistono quiz
+        // Determiniamo il motivo della generazione
+        let generationReason = 'no_quiz_exists';
+        const hasCompletedAll = await userHasCompletedAllQuizzes(user_id, contentId);
+        
+        if (hasCompletedAll) {
+            generationReason = 'all_quizzes_completed';
+            console.log('🎓 Utente ha completato tutti i quiz esistenti, genero un nuovo quiz...');
+        } else {
+            console.log('🆕 Nessun quiz esistente per questo contenuto, procedo con generazione...');
+        }
+
+        // Step 4: Prepara dati per Gemini
         console.log('🤖 Step 3: Preparazione dati per Gemini...');
         const contentData: TMDBContentData = {
             id: tmdb_id,
@@ -151,8 +176,8 @@ export async function POST(request: NextRequest) {
             tagline: tmdbData.tagline,
         };
 
-        // Step 4: Genera quiz con Gemini
-        console.log('✨ Step 4: Generazione quiz con Gemini AI...');
+        // Step 5: Genera quiz con Gemini
+        console.log('✨ Step 5: Generazione quiz con Gemini AI...');
         let quizResponse;
 
         try {
@@ -164,7 +189,9 @@ export async function POST(request: NextRequest) {
                 content_type,
                 false,
                 `Gemini generation failed: ${error.message}`,
-                Date.now() - startTime
+                Date.now() - startTime,
+                0,
+                generationReason
             );
 
             return NextResponse.json(
@@ -173,33 +200,50 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Step 5: Crea/recupera content_id
-        console.log('💾 Step 5: Creazione/recupero content...');
-        let contentId: string;
+        // Step 6: Crea entity Quiz
+        console.log('💾 Step 6: Creazione entity Quiz...');
+        let quizId: string;
+        const quizTitle = `Quiz ${tmdbData.title || tmdbData.name} #${Date.now()}`;
+        const quizDescription = `Quiz autogenerato con AI per ${tmdbData.title || tmdbData.name}`;
 
         try {
-            contentId = await getOrCreateContent(tmdb_id, content_type, tmdbData);
+            quizId = await createQuiz(
+                contentId,
+                quizTitle,
+                quizDescription,
+                generationReason,
+                true, // is_ai_generated
+                {
+                    model: 'gemini-2.0-flash',
+                    generated_at: new Date().toISOString(),
+                    content_title: tmdbData.title || tmdbData.name,
+                    user_requested: user_id
+                }
+            );
         } catch (error: any) {
             await logGenerationAttempt(
                 tmdb_id,
                 content_type,
                 false,
-                `Content creation failed: ${error.message}`,
-                Date.now() - startTime
+                `Quiz entity creation failed: ${error.message}`,
+                Date.now() - startTime,
+                quizResponse.questions.length,
+                generationReason
             );
 
             return NextResponse.json(
-                { error: 'Impossibile creare contenuto nel database', details: error.message },
+                { error: 'Impossibile creare quiz nel database', details: error.message },
                 { status: 500 }
             );
         }
 
-        // Step 6: Salva domande nel database
-        console.log('💾 Step 6: Salvataggio domande nel database...');
+        // Step 7: Salva domande collegate al quiz
+        console.log('💾 Step 7: Salvataggio domande nel database...');
         let savedQuestions: DBQuizQuestion[];
 
         try {
-            savedQuestions = await saveQuizQuestions(
+            savedQuestions = await saveQuizQuestionsWithQuizId(
+                quizId,
                 contentId,
                 quizResponse,
                 'Generated by Gemini AI',
@@ -212,16 +256,17 @@ export async function POST(request: NextRequest) {
                 false,
                 `Database save failed: ${error.message}`,
                 Date.now() - startTime,
-                quizResponse.questions.length
+                quizResponse.questions.length,
+                generationReason
             );
 
             return NextResponse.json(
-                { error: 'Impossibile salvare quiz nel database', details: error.message },
+                { error: 'Impossibile salvare domande nel database', details: error.message },
                 { status: 500 }
             );
         }
 
-        // Step 7: Log successo
+        // Step 8: Log successo
         const generationTime = Date.now() - startTime;
         await logGenerationAttempt(
             tmdb_id,
@@ -229,7 +274,8 @@ export async function POST(request: NextRequest) {
             true,
             undefined,
             generationTime,
-            savedQuestions.length
+            savedQuestions.length,
+            generationReason
         );
 
         console.log(`✅ Quiz completato in ${generationTime}ms`);
@@ -238,6 +284,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             cached: false,
+            reused: false,
+            quiz_id: quizId,
             quiz: {
                 questions: savedQuestions,
                 total_questions: savedQuestions.length,
@@ -246,10 +294,11 @@ export async function POST(request: NextRequest) {
                 content_id: contentId,
             },
             generation_time: generationTime,
+            generation_reason: generationReason,
             metadata: {
                 content_title: tmdbData.title || tmdbData.name,
                 generated_at: new Date().toISOString(),
-                model: 'gemini-2.5-flash',
+                model: 'gemini-2.0-flash',
             },
         });
 

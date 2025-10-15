@@ -56,22 +56,52 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ hasPassed: false });
         }
 
-        // Verifica se l'utente ha passato il quiz
-        const { data: attempts, error: attemptsError } = await supabase
-            .from("quiz_attempts")
-            .select("passed")
+        // Verifica se l'utente ha passato almeno un quiz per questo contenuto
+        // Controlla in user_quiz_completions (sistema intelligente)
+        const { data: completions, error: completionsError } = await supabase
+            .from("user_quiz_completions")
+            .select("id, passed")
             .eq("user_id", user.id)
             .eq("content_id", content.id)
-            .eq("passed", true)
+            .eq("passed", true)  // Solo quiz passati
             .limit(1);
 
-        if (attemptsError) {
-            console.error("Error checking quiz attempts:", attemptsError);
-            return NextResponse.json({ hasPassed: false });
+        if (completionsError) {
+            console.error("Error checking quiz completions:", completionsError);
+            // Fallback: controlla la vecchia tabella quiz_attempts
+            const { data: attempts } = await supabase
+                .from("quiz_attempts")
+                .select("passed")
+                .eq("user_id", user.id)
+                .eq("content_id", content.id)
+                .eq("passed", true)
+                .limit(1);
+                
+            return NextResponse.json({
+                hasPassed: attempts && attempts.length > 0,
+            });
         }
 
+        const hasPassed = completions && completions.length > 0;
+
+        // Opzionale: verifica anche se ci sono quiz disponibili da fare
+        const { data: availableQuizzes } = await supabase
+            .rpc('get_available_quizzes_for_user', {
+                p_user_id: user.id,
+                p_content_id: content.id,
+                p_limit: 1
+            });
+
+        const canRetryQuiz = availableQuizzes && availableQuizzes.length > 0;
+
         return NextResponse.json({
-            hasPassed: attempts && attempts.length > 0,
+            hasPassed,
+            canRetryQuiz,  // Indica se ci sono altri quiz disponibili
+            message: hasPassed 
+                ? "L'utente ha superato almeno un quiz" 
+                : canRetryQuiz 
+                    ? "L'utente può fare altri quiz"
+                    : "Nessun quiz disponibile"
         });
     } catch (error) {
         console.error("Error in check-status API:", error);

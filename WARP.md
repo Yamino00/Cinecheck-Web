@@ -53,13 +53,16 @@ src/app/api/
 └── [future endpoints]
 ```
 
-### Quiz System Logic
+### Quiz System Logic (Intelligent System)
 - **10 questions per quiz**: 5 easy (5pts), 4 medium (10pts), 1 hard (15pts)
 - **Total points**: 80 maximum
 - **Pass threshold**: 50 points (62.5%)
 - **Timer**: 30 seconds per question
+- **Smart Reuse**: Quiz are shared between users, generated only when needed
+- **No Duplicates**: Users can never retake the same quiz twice
+- **Tracking**: `user_quiz_completions` table tracks which quizzes each user has completed
+- **Entity-Based**: Each quiz is a separate entity that can be reused across multiple users
 - Questions are generated using Google Gemini AI (gemini-2.0-flash model)
-- Quizzes are cached in the database and auto-validated
 
 ### Page Routes
 ```
