@@ -139,6 +139,9 @@ temp/
 *.swo
 *~
 
+
+# File WARP (warp.dev)
+WARP.md
 # OS generated files
 .DS_Store
 .DS_Store?
