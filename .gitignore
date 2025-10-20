@@ -199,3 +199,5 @@ storybook-static
 .tmp/
 # Cursor AI
 .cursor/
+# Gemini AI
+.gemini/
