@@ -11,13 +11,27 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+// Debug: verifica che la Service Role Key sia caricata
+if (!supabaseServiceKey || supabaseServiceKey === 'undefined') {
+    console.error('❌ SUPABASE_SERVICE_ROLE_KEY non trovata! Usando anon key come fallback.');
+    console.error('Valore ricevuto:', supabaseServiceKey);
+}
+
 // Client Supabase con Service Role Key (bypassa RLS - solo per backend)
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-    },
-});
+const supabase = createClient(
+    supabaseUrl,
+    supabaseServiceKey || supabaseAnonKey, // Fallback a anon key se service key manca
+    {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+        },
+    }
+);
+
+console.log('🔑 quiz-db.ts - Client inizializzato con chiave:',
+    supabaseServiceKey ? 'SERVICE_ROLE ✅' : 'ANON (fallback) ⚠️'
+);
 
 /**
  * Interfacce Database
@@ -174,6 +188,8 @@ export async function getOrCreateContent(
     contentType: 'movie' | 'series',
     tmdbData: any
 ): Promise<string> {
+    console.log('🔍 getOrCreateContent - Tentativo di recupero/creazione content:', tmdbId, contentType);
+
     try {
         // Cerca se esiste già
         const { data: existing, error: searchError } = await supabase
@@ -187,6 +203,8 @@ export async function getOrCreateContent(
             console.log(`✅ Content già esistente: ${existing.id}`);
             return existing.id;
         }
+
+        console.log('📝 Content non trovato, creo nuovo...');
 
         // Altrimenti crea nuovo
         const contentToInsert = {
@@ -205,18 +223,24 @@ export async function getOrCreateContent(
             vote_average: tmdbData.vote_average,
         };
 
+        console.log('💾 Inserimento content:', JSON.stringify(contentToInsert, null, 2));
+
         const { data, error } = await supabase
             .from('contents')
             .insert(contentToInsert)
             .select('id')
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Errore inserimento content:', error);
+            throw error;
+        }
 
         console.log(`✅ Nuovo content creato: ${data.id}`);
         return data.id;
     } catch (error: any) {
         console.error('❌ Errore creazione content:', error.message);
+        console.error('Stack trace completo:', error);
         throw error;
     }
 }
