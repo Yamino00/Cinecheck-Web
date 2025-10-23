@@ -488,10 +488,9 @@
 
 **Features**:
 
-- [ ] **Multi-Rating System**
+- [ ] **Rating singolo**
 
-  - Rating Generale (0-10) - Obbligatorio
-  - Plot/Storia, Recitazione, Regia, Soundtrack (1-5 stars)
+- Rating Generale (0-10) - Obbligatorio
 
 - [ ] **Rich Text Editor**
 
@@ -962,7 +961,7 @@
 **Week 1 (16-23 Ottobre)**
 
 - **Giorni 1-3**: Review Form Component
-  - Multi-rating system
+  - Rating generale (0-10)
   - Rich text editor
   - Draft functionality
 - **Giorni 4-5**: Review Display
