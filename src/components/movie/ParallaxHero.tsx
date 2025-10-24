@@ -172,7 +172,7 @@ export default function ParallaxHero({ movie }: ParallaxHeroProps) {
                   </span>
                 </div>
                 <span className="text-sm text-gray-400">
-                  {movie.vote_count.toLocaleString()} votes
+                  {movie.vote_count.toLocaleString("it-IT")} votes
                 </span>
               </div>
             </div>

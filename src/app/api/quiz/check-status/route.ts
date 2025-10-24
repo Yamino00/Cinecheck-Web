@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
                 .eq("content_id", content.id)
                 .eq("passed", true)
                 .limit(1);
-                
+
             return NextResponse.json({
                 hasPassed: attempts && attempts.length > 0,
             });
@@ -88,8 +88,7 @@ export async function GET(request: NextRequest) {
         const { data: availableQuizzes } = await supabase
             .rpc('get_available_quizzes_for_user', {
                 p_user_id: user.id,
-                p_content_id: content.id,
-                p_limit: 1
+                p_content_id: content.id
             });
 
         const canRetryQuiz = availableQuizzes && availableQuizzes.length > 0;
@@ -97,9 +96,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
             hasPassed,
             canRetryQuiz,  // Indica se ci sono altri quiz disponibili
-            message: hasPassed 
-                ? "L'utente ha superato almeno un quiz" 
-                : canRetryQuiz 
+            message: hasPassed
+                ? "L'utente ha superato almeno un quiz"
+                : canRetryQuiz
                     ? "L'utente può fare altri quiz"
                     : "Nessun quiz disponibile"
         });

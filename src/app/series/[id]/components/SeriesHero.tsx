@@ -107,7 +107,7 @@ export default function SeriesHero({ series }: SeriesHeroProps) {
                   </span>
                 </div>
                 <span className="text-sm text-gray-400">
-                  ({series.vote_count.toLocaleString()} voti)
+                  ({series.vote_count.toLocaleString("it-IT")} voti)
                 </span>
               </div>
 

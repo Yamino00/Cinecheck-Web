@@ -166,7 +166,7 @@ export default function ParallaxSeriesHero({
                   </span>
                 </div>
                 <span className="text-sm text-gray-400">
-                  {series.vote_count.toLocaleString()} votes
+                  {series.vote_count.toLocaleString("it-IT")} votes
                 </span>
               </div>
             </div>

@@ -40,14 +40,18 @@ export default function QuizOrReviewButton({
       setIsLoading(true);
 
       // Ottieni il token di autenticazione
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       // Cerca content_id dal tmdb_id
       const contentResponse = await fetch(
         `/api/quiz/check-status?tmdb_id=${contentId}&type=${contentType}`,
         {
           headers: {
-            'Authorization': session?.access_token ? `Bearer ${session.access_token}` : '',
+            Authorization: session?.access_token
+              ? `Bearer ${session.access_token}`
+              : "",
           },
         }
       );
@@ -59,12 +63,12 @@ export default function QuizOrReviewButton({
 
       const data = await contentResponse.json();
       setHasPassedQuiz(data.hasPassed);
-      
+
       // Log per debugging
-      console.log('🎯 Quiz Status:', {
+      console.log("🎯 Quiz Status:", {
         hasPassed: data.hasPassed,
         canRetryQuiz: data.canRetryQuiz,
-        message: data.message
+        message: data.message,
       });
     } catch (error) {
       console.error("Error checking quiz status:", error);
@@ -126,13 +130,10 @@ export default function QuizOrReviewButton({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleReviewClick}
-        className="flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-lg font-semibold text-lg transition-all shadow-lg"
+        className="flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-gray-200 text-black rounded-lg font-semibold text-lg transition-colors shadow-lg"
       >
         <Edit3 className="w-6 h-6" />
-        <span>✍️ Scrivi Recensione</span>
-        <span className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs font-medium">
-          Verificata
-        </span>
+        <span>Scrivi Recensione</span>
       </motion.button>
     );
   }

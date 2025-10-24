@@ -48,12 +48,19 @@ supabase gen types typescript  # Rigenera tipi DB
 **Quiz Verification** (Prerequisito recensioni):
 
 - `/src/app/api/quiz/generate/route.ts` (logica intelligente)
+- `/src/app/api/quiz/start/route.ts`, `/src/app/api/quiz/submit/route.ts`
 - `/src/lib/quiz-db.ts`, `/src/lib/gemini.ts`
 
 **Database**:
 
 - `/supabase/migrations/` (applicare in ordine sequenziale)
 - `/src/lib/supabase.ts` (client + helpers)
+
+**⚠️ Codice Rimosso** (Cleanup 24 Ott 2025):
+
+- ❌ `/src/services/quiz.ts` - Service layer pre-intelligente (470 righe duplicate)
+- ❌ Funzioni obsolete in `quiz-db.ts`: `getQuizByContentId()`, `getQuizByTmdbId()`, `saveQuizQuestions()`
+- ❌ Cartelle vuote: `/api/quiz/intelligent/`, `/api/quiz/reviews/`, `/api/quiz/complete/`
 
 ## 🧠 Sistema Quiz Verificato (PREREQUISITO RECENSIONI)
 

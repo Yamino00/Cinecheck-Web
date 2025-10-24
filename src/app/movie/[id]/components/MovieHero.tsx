@@ -93,7 +93,7 @@ export default function MovieHero({ movie }: MovieHeroProps) {
                   </span>
                 </div>
                 <span className="text-sm text-gray-400">
-                  ({movie.vote_count.toLocaleString()} voti)
+                  ({movie.vote_count.toLocaleString("it-IT")} voti)
                 </span>
               </div>
 

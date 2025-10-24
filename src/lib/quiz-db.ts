@@ -92,95 +92,6 @@ export interface DBContent {
 }
 
 /**
- * Verifica se esiste un quiz per un contenuto
- */
-export async function getQuizByContentId(contentId: string): Promise<DBQuizQuestion[] | null> {
-    try {
-        const { data, error } = await supabase
-            .from('quiz_questions')
-            .select('*')
-            .eq('content_id', contentId)
-            .eq('validation_status', 'validated')
-            .order('difficulty', { ascending: true });
-
-        if (error) throw error;
-
-        return data && data.length > 0 ? data : null;
-    } catch (error: any) {
-        console.error('❌ Errore recupero quiz:', error.message);
-        return null;
-    }
-}
-
-/**
- * Verifica se esiste un quiz per TMDB ID (senza content_id ancora)
- */
-export async function getQuizByTmdbId(tmdbId: number, contentType: 'movie' | 'series'): Promise<DBQuizQuestion[] | null> {
-    try {
-        // Prima trova il content
-        const { data: content, error: contentError } = await supabase
-            .from('contents')
-            .select('id')
-            .eq('tmdb_id', tmdbId)
-            .eq('type', contentType)
-            .single();
-
-        if (contentError || !content) return null;
-
-        // Poi recupera il quiz
-        return getQuizByContentId(content.id);
-    } catch (error: any) {
-        console.error('❌ Errore recupero quiz by TMDB ID:', error.message);
-        return null;
-    }
-}
-
-/**
- * Salva domande quiz generate da Gemini
- */
-export async function saveQuizQuestions(
-    contentId: string,
-    quizResponse: GeminiQuizResponse,
-    generationPrompt: string,
-    tmdbData: any
-): Promise<DBQuizQuestion[]> {
-    try {
-        const questionsToInsert = quizResponse.questions.map(q => ({
-            content_id: contentId,
-            question: q.question,
-            correct_answer: q.correct_answer,
-            wrong_answers: q.wrong_answers,
-            difficulty: q.difficulty,
-            category: q.category,
-            time_limit: q.time_limit,
-            points: q.points,
-            hint: q.hint,
-            explanation: q.explanation,
-            times_answered: 0,
-            times_correct: 0,
-            generated_by: 'gemini-2.5-flash',
-            generation_prompt: generationPrompt,
-            tmdb_data: tmdbData,
-            validation_status: 'validated', // Auto-validato per ora
-            quality_score: 0,
-        }));
-
-        const { data, error } = await supabase
-            .from('quiz_questions')
-            .insert(questionsToInsert)
-            .select();
-
-        if (error) throw error;
-
-        console.log(`✅ Salvate ${data.length} domande quiz per content ${contentId}`);
-        return data;
-    } catch (error: any) {
-        console.error('❌ Errore salvataggio quiz:', error.message);
-        throw error;
-    }
-}
-
-/**
  * Crea o recupera un contenuto da TMDB ID
  */
 export async function getOrCreateContent(
@@ -450,8 +361,7 @@ export async function getAvailableQuizzesForUser(
         const { data, error } = await supabase
             .rpc('get_available_quizzes_for_user', {
                 p_user_id: userId,
-                p_content_id: contentId,
-                p_limit: 10 // Prendiamo fino a 10 quiz disponibili
+                p_content_id: contentId
             });
 
         if (error) {
