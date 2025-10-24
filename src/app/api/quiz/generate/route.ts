@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         // Step 1: Cerca quiz disponibili che l'utente NON ha ancora fatto
         console.log('🔍 Step 1: Ricerca quiz disponibili per utente...');
         let availableQuizzes: DBQuiz[] = [];
-        
+
         try {
             availableQuizzes = await getAvailableQuizzesForUser(user_id, contentId);
             console.log(`📊 Trovati ${availableQuizzes.length} quiz disponibili`);
@@ -112,13 +112,21 @@ export async function POST(request: NextRequest) {
         if (availableQuizzes.length > 0) {
             const selectedQuiz = availableQuizzes[0]; // Prendi il primo (più popolare)
             console.log(`✅ Quiz disponibile trovato: ${selectedQuiz.id}`);
+            console.log(`📋 Quiz info:`, {
+                title: selectedQuiz.title,
+                total_questions: selectedQuiz.total_questions,
+                completion_count: selectedQuiz.completion_count,
+                is_active: selectedQuiz.is_active
+            });
 
             // Carica le domande del quiz
+            console.log(`🔍 Caricamento domande per quiz ${selectedQuiz.id}...`);
             const questions = await getQuizQuestions(selectedQuiz.id);
+            console.log(`📊 Domande caricate: ${questions.length}`);
 
             if (questions.length > 0) {
                 console.log(`✅ Restituisco quiz esistente con ${questions.length} domande`);
-                
+
                 return NextResponse.json({
                     success: true,
                     cached: true,
@@ -135,6 +143,9 @@ export async function POST(request: NextRequest) {
                     generation_time: Date.now() - startTime,
                     message: 'Quiz riutilizzato dal database'
                 });
+            } else {
+                console.warn(`⚠️ Quiz ${selectedQuiz.id} trovato ma SENZA domande! Possibile problema RLS o dati corrotti.`);
+                console.warn(`   Provo con il prossimo quiz disponibile...`);
             }
         }
 
@@ -142,7 +153,7 @@ export async function POST(request: NextRequest) {
         // Determiniamo il motivo della generazione
         let generationReason = 'no_quiz_exists';
         const hasCompletedAll = await userHasCompletedAllQuizzes(user_id, contentId);
-        
+
         if (hasCompletedAll) {
             generationReason = 'all_quizzes_completed';
             console.log('🎓 Utente ha completato tutti i quiz esistenti, genero un nuovo quiz...');

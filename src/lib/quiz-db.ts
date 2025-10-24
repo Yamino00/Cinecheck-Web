@@ -345,9 +345,11 @@ export interface DBQuiz {
     difficulty_distribution?: any;
     completion_count: number;
     average_score: number;
+    is_active: boolean;
     last_used_at?: string;
     created_at: string;
 }
+
 
 /**
  * Trova quiz disponibili per un utente (che non ha ancora completato)
