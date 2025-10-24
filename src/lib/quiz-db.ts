@@ -191,61 +191,36 @@ export async function getOrCreateContent(
     console.log('🔍 getOrCreateContent - Tentativo di recupero/creazione content:', tmdbId, contentType);
 
     try {
-        // Cerca se esiste già
-        const { data: existing, error: searchError } = await supabase
-            .from('contents')
-            .select('id')
-            .eq('tmdb_id', tmdbId)
-            .eq('type', contentType)
-            .single();
-
-        if (existing && !searchError) {
-            console.log(`✅ Content già esistente: ${existing.id}`);
-            return existing.id;
-        }
-
-        console.log('📝 Content non trovato, creo nuovo...');
-
-        // Altrimenti crea nuovo
-        const contentToInsert = {
-            tmdb_id: tmdbId,
-            type: contentType,
-            title: tmdbData.title || tmdbData.name,
-            original_title: tmdbData.original_title || tmdbData.original_name,
-            overview: tmdbData.overview,
-            poster_path: tmdbData.poster_path,
-            backdrop_path: tmdbData.backdrop_path,
-            release_date: tmdbData.release_date || tmdbData.first_air_date,
-            runtime: tmdbData.runtime || tmdbData.number_of_episodes,
-            genres: tmdbData.genres,
-            cast_members: tmdbData.cast?.slice(0, 10),
-            crew: tmdbData.crew?.slice(0, 5),
-            vote_average: tmdbData.vote_average,
-        };
-
-        console.log('💾 Inserimento content:', JSON.stringify(contentToInsert, null, 2));
-
-        const { data, error } = await supabase
-            .from('contents')
-            .insert(contentToInsert)
-            .select('id')
-            .single();
+        // Usa la funzione SECURITY DEFINER che bypassa RLS in modo sicuro
+        const { data, error } = await supabase.rpc('get_or_create_content', {
+            p_tmdb_id: tmdbId,
+            p_type: contentType,
+            p_title: tmdbData.title || tmdbData.name,
+            p_original_title: tmdbData.original_title || tmdbData.original_name,
+            p_overview: tmdbData.overview,
+            p_poster_path: tmdbData.poster_path,
+            p_backdrop_path: tmdbData.backdrop_path,
+            p_release_date: tmdbData.release_date || tmdbData.first_air_date,
+            p_runtime: tmdbData.runtime || tmdbData.number_of_episodes,
+            p_genres: tmdbData.genres || null,
+            p_cast_members: tmdbData.cast?.slice(0, 10) || null,
+            p_crew: tmdbData.crew?.slice(0, 5) || null,
+            p_vote_average: tmdbData.vote_average || null
+        });
 
         if (error) {
-            console.error('❌ Errore inserimento content:', error);
+            console.error('❌ Errore chiamata funzione get_or_create_content:', error);
             throw error;
         }
 
-        console.log(`✅ Nuovo content creato: ${data.id}`);
-        return data.id;
+        console.log(`✅ Content recuperato/creato: ${data}`);
+        return data;
     } catch (error: any) {
         console.error('❌ Errore creazione content:', error.message);
         console.error('Stack trace completo:', error);
         throw error;
     }
-}
-
-/**
+}/**
  * Crea un nuovo tentativo quiz
  */
 export async function createQuizAttempt(
