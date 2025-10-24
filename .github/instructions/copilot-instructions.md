@@ -156,19 +156,26 @@ cast_members: tmdbData.credits?.cast; // TMDB usa 'cast', DB usa 'cast_members'
 **RLS Policies**:
 
 - Profiles: Read pubblico, update solo proprio
-- Contents: Read pubblico, insert autenticati (migration 009)
+- Contents: Read pubblico, insert via `SECURITY DEFINER` function (migration 010)
 - Reviews: Insert solo se quiz passato
 - Quiz: Utenti vedono solo propri attempts
 
-**⚠️ CRITICAL: Service Role Permissions**:
+**⚠️ CRITICAL: SECURITY DEFINER Pattern**:
 
-- Il role `service_role` DEVE avere permessi completi su schema `public`
-- Senza questi permessi → Error 42501 "permission denied for schema public"
-- Fix: Migration 010 (GRANT ALL su schema public)
+- **Problema**: service_role in Supabase non può essere modificato direttamente (reserved role)
+- **Soluzione**: Funzione `get_or_create_content()` con `SECURITY DEFINER` che bypassa RLS
+- **Pattern Standard Supabase**: Recommended approach per operazioni amministrative
+- **Sicurezza**: Funzione controllata e validata, solo operazioni specifiche bypassano RLS
 
-**Funzioni DB Critiche da Verificare**:
+**Funzioni DB Critiche**:
 
 ```sql
+-- Funzione SECURITY DEFINER per gestione contents (migration 010)
+SELECT routine_name, security_type FROM information_schema.routines
+WHERE routine_name = 'get_or_create_content';
+-- Deve essere: security_type = 'DEFINER'
+
+-- Funzioni sistema quiz intelligente
 SELECT routine_name FROM information_schema.routines
 WHERE routine_schema = 'public' AND routine_name LIKE '%quiz%';
 -- Devono esistere: get_available_quizzes_for_user, user_has_completed_all_quizzes,
@@ -177,7 +184,7 @@ WHERE routine_schema = 'public' AND routine_name LIKE '%quiz%';
 
 ## 🔐 Auth & Security
 
-**useAuth Hook** (`/src/hooks/useAuth.ts`): Auto-crea profilo su signup/OAuth login  
+**useAuth Hook** (`/src/hooks/useAuth.ts`): Semplificato, profilo creato da trigger DB (migration 008)  
 **Protected Routes**: `/profile`, `/reviews`, `/watchlist`, `/lists` (redirect → `/auth`)  
 **Rate Limits** (`/src/lib/security.ts`): 5 req/min auth, 20 req/min quiz, 100 req/min general
 
@@ -220,30 +227,32 @@ export async function POST(request) {
    - Added `is_active` column to `quizzes` table
    - **Missing**: `user_quiz_completions` table and intelligent quiz functions
 6. `006_restore_intelligent_quiz_logic.sql` - **CRITICAL FIX**: Restores intelligent quiz system features deleted by 005
-
    - Recreates `user_quiz_completions` table with `UNIQUE(user_id, quiz_id)` constraint
    - Restores `get_available_quizzes_for_user(p_user_id, p_content_id)` function
    - References `is_active` column from 005 schema
-
-7. `006_restore_intelligent_quiz_logic.sql` - **CRITICAL FIX**: Restores intelligent quiz system features deleted by 005
-   - Recreates `user_quiz_completions` table with `UNIQUE(user_id, quiz_id)` constraint
-   - Restores `get_available_quizzes_for_user(p_user_id, p_content_id)` function
-   - References `is_active` column from 005 schema
-8. `007_complete_intelligent_quiz_functions.sql` - **FINAL COMPLETION**: Adds missing functions from 006
+7. `007_complete_intelligent_quiz_functions.sql` - **FINAL COMPLETION**: Adds missing functions from 006
    - Creates `user_has_completed_all_quizzes(p_user_id, p_content_id)` function
    - Creates `update_quiz_statistics(quiz_uuid)` function
    - Creates `trigger_update_quiz_statistics()` trigger function
    - Adds trigger on `user_quiz_completions` for automatic stats updates
+8. `008_auto_create_profile_trigger.sql` - **PROFILE FIX**: Auto-creates profiles on user signup
+   - Creates `on_auth_user_created()` trigger function with SECURITY DEFINER
+   - Trigger runs after INSERT on `auth.users` table
+   - Eliminates 403 profile creation errors during signup/OAuth
+9. `009_fix_contents_rls_policy.sql` - **SUPERSEDED**: Attempted RLS policy fix (migration 010 replaced this approach)
+10. `010_grant_schema_permissions.sql` - **SECURITY DEFINER SOLUTION**: Final fix for content creation
+    - Creates `get_or_create_content()` function with SECURITY DEFINER privilege
+    - Function bypasses RLS safely for administrative content operations
+    - **Why**: `service_role` is a **reserved role** in Supabase - cannot be modified with GRANT or ALTER
+    - **Pattern**: Official Supabase recommendation for admin operations requiring RLS bypass
+    - Includes type casting for content_type ENUM and proper column mapping
 
 **Current Production State**:
 
-- Migrations 001-006: ✅ Applied
-- Migration 007: ⚠️ Pending (quiz functions)
-- Migration 008: ⚠️ Pending (auto-create profile trigger)
-- Migration 009: ⚠️ Pending (fix contents RLS policy)
-- **Migration 010: 🔴 CRITICAL BLOCKER** (grant schema permissions to service_role)
+- Migrations 001-010: ✅ Applied (quiz + security definer + profile trigger all working)
+- **All critical systems operational**: Quiz generation, content caching, profile creation
 
-**⚠️ URGENT**: Migration 010 MUST be applied immediately - without it, error 42501 blocks all quiz generation!
+**⚠️ Migration Status**: All migrations successfully applied. System fully operational.
 
 **Key Insights for Development**:
 
@@ -302,20 +311,20 @@ Apply via Supabase CLI: `supabase db reset` (local) or Supabase dashboard (produ
 
 ## 🐛 Common Issues & Solutions
 
-### Profile Issues
+### Quiz System Issues (RISOLTI)
 
-- **"Profile not found"**: `useAuth` hook handles auto-creation, but RLS policies must allow inserts
-- **Profile not created on OAuth login**: Check `useAuth.ts` effect for `SIGNED_IN` event
-- **Solution**: Profile creation happens in two places:
-  1. `signUp()` function in `/src/lib/supabase.ts`
-  2. `useAuth` hook on `SIGNED_IN` event for OAuth
+- **Error 42501 "permission denied"**: ✅ Risolto con Migration 010 (SECURITY DEFINER function)
+- **"service_role doesn't bypass RLS"**: ✅ service_role è un **reserved role** in Supabase - non modificabile
+- **Solution Pattern**: Usare funzioni `SECURITY DEFINER` per operazioni amministrative (es. `get_or_create_content()`)
+- **Quiz not generating**: Check `quiz_generation_logs` table per error messages
+- **"No quizzes available"**: User completato tutti quiz - sistema genera nuovo
+- **Duplicate quiz error**: `UNIQUE(user_id, quiz_id)` constraint previene retaking
 
-### Quiz System Issues
+### Profile Issues (RISOLTI)
 
-- **Quiz not generating**: Check `quiz_generation_logs` table for error messages
-- **"No quizzes available"**: User completed all quizzes - system will generate new one
-- **Duplicate quiz error**: `UNIQUE(user_id, quiz_id)` constraint prevents retaking
-- **Solution**: Use `GET /api/quiz/check-status` to check quiz status before generating
+- **"Profile not found"**: ✅ Risolto con Migration 008 (trigger auto-create on auth.users INSERT)
+- **Profile not created on OAuth**: ✅ Trigger `on_auth_user_created` gestisce tutti signup types
+- **RLS policies blocking profile creation**: ✅ Trigger usa SECURITY DEFINER per bypassare RLS
 
 ### TMDB API Issues
 
