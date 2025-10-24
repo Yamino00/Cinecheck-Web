@@ -62,6 +62,13 @@ supabase gen types typescript  # Rigenera tipi DB
 - ❌ Funzioni obsolete in `quiz-db.ts`: `getQuizByContentId()`, `getQuizByTmdbId()`, `saveQuizQuestions()`
 - ❌ Cartelle vuote: `/api/quiz/intelligent/`, `/api/quiz/reviews/`, `/api/quiz/complete/`
 
+**🔧 Fix Recenti** (24 Ott 2025):
+
+- ✅ Aggiunto campo `is_active` all'interfaccia `DBQuiz` in `quiz-db.ts`
+- ✅ Migliorato logging in `/api/quiz/generate` per debug sistema riutilizzo quiz
+- ✅ Confermato funzionamento sistema intelligente: quiz condivisi tra utenti ✅
+- ✅ Fix hydration error: `toLocaleString('it-IT')` per formattazione consistente server/client
+
 ## 🧠 Sistema Quiz Verificato (PREREQUISITO RECENSIONI)
 
 **Scopo**: Anti-fake reviews - Solo chi passa il quiz può recensire (prova di visione)  
